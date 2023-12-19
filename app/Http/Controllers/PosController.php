@@ -79,7 +79,7 @@ class PosController extends Controller
             } else {
                 $default_Client = '';
             }
-            
+
             $clients = Client::where('deleted_at', '=', null)->get(['id', 'username']);
             $payment_methods = PaymentMethod::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','title']);
             $accounts = Account::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','account_name']);
@@ -90,13 +90,13 @@ class PosController extends Controller
             }else{
                 $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
                 $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
-            } 
+            }
 
             $totalRows = '';
             $data = [];
             $product_autocomplete = [];
 
-           
+
             return view('sales.pos',[
                 'clients'            => $clients,
                 'payment_methods'    => $payment_methods,
@@ -107,7 +107,7 @@ class PosController extends Controller
                 'default_Client'     => $default_Client,
                 'totalRows'          => $totalRows,
             ]);
-                 
+
 
         }else{
             return abort('403', __('You are not authorized'));
@@ -241,7 +241,7 @@ class PosController extends Controller
                 ]);
 
             }
-           
+
             return $order->id;
 
         }, 10);
@@ -260,7 +260,7 @@ class PosController extends Controller
         } else {
             return $gen_code;
         }
-        
+
     }
 
     //------------ Get Products--------------\\
@@ -347,7 +347,7 @@ class PosController extends Controller
             //check if product has promotion
             $todaydate = date('Y-m-d');
 
-            if($product_warehouse['product']->is_promo 
+            if($product_warehouse['product']->is_promo
                 && $todaydate >= $product_warehouse['product']->promo_start_date
                 && $todaydate <= $product_warehouse['product']->promo_end_date){
                     $price_init = $product_warehouse['product']->promo_price;
@@ -365,7 +365,7 @@ class PosController extends Controller
             }elseif ($product_warehouse['product']['unitSale'] && $product_warehouse['product']['unitSale']->operator == '*') {
                 $item['qte_sale'] = $product_warehouse->qte / $product_warehouse['product']['unitSale']->operator_value;
                 $price = $price_init * $product_warehouse['product']['unitSale']->operator_value;
-           
+
             }else{
                 $item['qte_sale'] = $product_warehouse->qte;
                 $price = $price_init;
@@ -456,17 +456,17 @@ class PosController extends Controller
             }
 
             $item['id'] = $product_warehouse->product_id;
-            
+
             $item['qty_min'] = $product_warehouse['product']->type != 'is_service'?$product_warehouse['product']->qty_min:'---';
             $item['Type_barcode'] = $product_warehouse['product']->Type_barcode;
             $item['product_type'] = $product_warehouse['product']->type;
 
             if ($product_warehouse['product']['unitSale'] && $product_warehouse['product']['unitSale']->operator == '/') {
                 $item['qte_sale'] = $product_warehouse->qte * $product_warehouse['product']['unitSale']->operator_value;
-           
+
             } elseif ($product_warehouse['product']['unitSale'] && $product_warehouse['product']['unitSale']->operator == '*') {
                 $item['qte_sale'] = $product_warehouse->qte / $product_warehouse['product']['unitSale']->operator_value;
-            
+
             }else{
                 $item['qte_sale'] = $product_warehouse->qte;
             }
@@ -481,12 +481,12 @@ class PosController extends Controller
     }
 
      //------------- Reference Number Order SALE -----------\\
- 
+
      public function getNumberOrder()
      {
- 
+
          $last = DB::table('sales')->latest('id')->first();
- 
+
          if ($last) {
              $item = $last->Ref;
              $nwMsg = explode("_", $item);
@@ -507,11 +507,26 @@ class PosController extends Controller
         if ($user_auth->can('pos')){
 
             $details = array();
-    
+
             $sale = Sale::with('details.product.unitSale')
                 ->where('deleted_at', '=', null)
                 ->findOrFail($id);
-    
+
+            $total_amount = DB::table('sales')
+                ->where('deleted_at', '=', null)
+                ->where('client_id', $sale->client_id)
+
+                ->sum('GrandTotal');
+
+            $total_paid= DB::table('sales')
+                ->where('sales.deleted_at', '=', null)
+                ->where('sales.client_id', $sale->client_id)
+                ->sum('paid_amount');
+
+            $sell_due =  $total_amount - $total_paid;
+
+            $dueclient=$sell_due;
+
             $item['id']                     = $sale->id;
             $item['Ref']                    = $sale->Ref;
             $item['date']                   = Carbon::parse($sale->date)->format('d-m-Y H:i');
@@ -530,33 +545,34 @@ class PosController extends Controller
             $item['GrandTotal']             = $this->render_price_with_symbol_placement(number_format($sale->GrandTotal, 2, '.', ','));
             $item['paid_amount']            = $this->render_price_with_symbol_placement(number_format($sale->paid_amount, 2, '.', ','));
             $item['due']                    = $this->render_price_with_symbol_placement(number_format($sale->GrandTotal - $sale->paid_amount, 2, '.', ','));
+            $item['client_due']             = $this->render_price_with_symbol_placement(number_format($sell_due, 2, '.', ','));
             foreach ($sale['details'] as $detail) {
-    
+
                 $unit = Unit::where('id', $detail->sale_unit_id)->first();
                 if ($detail->product_variant_id) {
-    
+
                     $productsVariants = ProductVariant::where('product_id', $detail->product_id)
                         ->where('id', $detail->product_variant_id)->first();
-    
+
                         $data['code'] = $productsVariants->code;
                         $data['name'] = '['.$productsVariants->name . '] ' . $detail['product']['name'];
-                        
+
                     } else {
                         $data['code'] = $detail['product']['code'];
                         $data['name'] = $detail['product']['name'];
                     }
-                    
+
                 $data['price'] = $this->render_price_with_symbol_placement(number_format($detail->price, 2, '.', ','));
                 $data['total'] = $this->render_price_with_symbol_placement(number_format($detail->total, 2, '.', ','));
                 $data['quantity'] = $detail->quantity;
                 $data['unit_sale'] = $unit?$unit->ShortName:'';
-    
+
                 $data['is_imei'] = $detail['product']['is_imei'];
                 $data['imei_number'] = $detail->imei_number;
-    
+
                 $details[] = $data;
             }
-    
+
             $payments = PaymentSale::with('sale','payment_method')
                 ->where('sale_id', $id)
                 ->orderBy('id', 'DESC')
@@ -570,10 +586,10 @@ class PosController extends Controller
 
                 $payments_details[] = $payment_data;
             }
-    
+
             $settings = Setting::where('deleted_at', '=', null)->first();
             $pos_settings = PosSetting::where('deleted_at', '=', null)->first();
-    
+
             return view('sales.invoice_pos',
                     [
                         'payments' => $payments_details,
@@ -586,9 +602,9 @@ class PosController extends Controller
 
         }
         return abort('403', __('You are not authorized'));
- 
+
      }
- 
+
 
 
     // render_price_with_symbol_placement
@@ -602,6 +618,6 @@ class PosController extends Controller
         }
     }
 
-   
+
 
 }

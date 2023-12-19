@@ -109,7 +109,7 @@ $setting = DB::table('settings')->where('deleted_at', '=', null)->first();
             <tr v-show="isPaidLessThanTotal">
               <td colspan="3" class="total">{{ __('translate.Due') }}</td>
               <td class="total text-right">
-                @{{sale.due}}
+                @{{sale.client_due}}
               </td>
             </tr>
           </tbody>
