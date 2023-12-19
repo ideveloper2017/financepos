@@ -6,7 +6,11 @@ if(isset($_COOKIE['language']) &&  $_COOKIE['language'] == 'ar') {
 } else {
     $languageDirection = 'ltr' ;
 }
-		
+
+
+$path = Request::path();
+$parentPath = explode("/",$path)[0];
+$setting = DB::table('settings')->where('deleted_at', '=', null)->first();
 ?>
 
 <!DOCTYPE html>
@@ -35,9 +39,11 @@ if(isset($_COOKIE['language']) &&  $_COOKIE['language'] == 'ar') {
     <div id="invoice-POS">
       <div>
         <div class="info">
+            <div style="text-align: center">
+                <img class="app-logo me-2" width="100" src="{{asset('images/'.$setting->logo)}}" alt="">
+            </div>
           <h2 class="text-center">@{{setting.CompanyName}}</h2>
-
-          <p dir="{{ $languageDirection }}"> 
+          <p dir="{{ $languageDirection }}">
             <span>{{ __('translate.date') }} : @{{sale.date}} <br></span>
             <span>{{ __('translate.Sale') }}: @{{sale.Ref}} <br></span>
             <span v-show="pos_settings.show_address">{{ __('translate.Address') }} : @{{setting.CompanyAdress}}
@@ -56,13 +62,10 @@ if(isset($_COOKIE['language']) &&  $_COOKIE['language'] == 'ar') {
           <tbody>
             <tr v-for="detail_invoice in details">
               <td colspan="3">
-                @{{detail_invoice.name}}
+                  <span>@{{formatNumber(detail_invoice.quantity,0)}} x @{{detail_invoice.price}}</span>&nbsp @{{detail_invoice.name}}
                 <br v-show="detail_invoice.is_imei && detail_invoice.imei_number !==null">
                 <span v-show="detail_invoice.is_imei && detail_invoice.imei_number !==null ">IMEI_SN :
                   @{{detail_invoice.imei_number}}</span>
-                <br>
-                <span>@{{formatNumber(detail_invoice.quantity,2)}} @{{detail_invoice.unit_sale}} x
-                  @{{detail_invoice.price}}</span>
               </td>
               <td class="product_detail_invoice">
                 @{{detail_invoice.total}}
@@ -82,7 +85,7 @@ if(isset($_COOKIE['language']) &&  $_COOKIE['language'] == 'ar') {
               <td class="total text-right">
                 <span>@{{sale.discount}}</span>
               </td>
-          
+
             </tr>
 
             <tr class="mt-10" v-show="pos_settings.show_discount">
@@ -132,7 +135,7 @@ if(isset($_COOKIE['language']) &&  $_COOKIE['language'] == 'ar') {
 
         <div id="legalcopy" class="ms-2"  v-show="pos_settings.show_note">
           <p class="legal">
-            <strong>{{ __('translate.Thank_You_For_Shopping_With_Us_Please_Come_Again') }}</strong>
+            <strong>@{{ pos_settings.note_customer }}</strong>
           </p>
         </div>
 
@@ -148,13 +151,13 @@ if(isset($_COOKIE['language']) &&  $_COOKIE['language'] == 'ar') {
         el: '#in_pos',
 
         data: {
-           
+
             payments: @json($payments),
             details: @json($details),
             pos_settings:@json($pos_settings),
             sale: @json($sale),
             setting: @json($setting),
-         
+
         },
 
         mounted() {
@@ -172,7 +175,7 @@ if(isset($_COOKIE['language']) &&  $_COOKIE['language'] == 'ar') {
           isPaidLessThanTotal() {
           return parseFloat(this.sale.paid_amount) < parseFloat(this.sale.GrandTotal);
         },
-          
+
         //------------------------------Formetted Numbers -------------------------\\
         formatNumber(number, dec) {
             const value = (typeof number === "string"
@@ -203,10 +206,10 @@ if(isset($_COOKIE['language']) &&  $_COOKIE['language'] == 'ar') {
               a.print();
             }, 1000);
 
-            
+
 
           },
-        
+
         },
         //-----------------------------Autoload function-------------------
         created() {
@@ -214,7 +217,7 @@ if(isset($_COOKIE['language']) &&  $_COOKIE['language'] == 'ar') {
         }
 
       })
-  
+
   </script>
 
 
