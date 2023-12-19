@@ -42,7 +42,7 @@ $setting = DB::table('settings')->where('deleted_at', '=', null)->first();
             <div style="text-align: center">
                 <img class="app-logo me-2" width="100" src="{{asset('images/'.$setting->logo)}}" alt="">
             </div>
-          <h2 class="text-center">@{{setting.CompanyName}}</h2>
+{{--          <h2 class="text-center">@{{setting.CompanyName}}</h2>--}}
           <p dir="{{ $languageDirection }}">
             <span>{{ __('translate.date') }} : @{{sale.date}} <br></span>
             <span>{{ __('translate.Sale') }}: @{{sale.Ref}} <br></span>
@@ -62,7 +62,7 @@ $setting = DB::table('settings')->where('deleted_at', '=', null)->first();
           <tbody>
             <tr v-for="detail_invoice in details">
               <td colspan="3">
-                  <span>@{{formatNumber(detail_invoice.quantity,0)}} x @{{detail_invoice.price}}</span>&nbsp @{{detail_invoice.name}}
+                @{{detail_invoice.name}}&nbsp &nbsp<span>@{{formatNumber(detail_invoice.quantity,0)}} x @{{detail_invoice.price}}</span>
                 <br v-show="detail_invoice.is_imei && detail_invoice.imei_number !==null">
                 <span v-show="detail_invoice.is_imei && detail_invoice.imei_number !==null ">IMEI_SN :
                   @{{detail_invoice.imei_number}}</span>
