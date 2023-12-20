@@ -86,7 +86,6 @@
                     </div>
                 </div>
             </div>
-
           <div class="d-flex align-items-center">
 
             <div class="w-100 text-gray-600 position-relative">
