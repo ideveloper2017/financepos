@@ -269,7 +269,7 @@ class ProductsController extends Controller
     public function create()
     {
         $user_auth = auth()->user();
-        if ($user_auth->can('adjustment_add')){
+
 
             //get warehouses assigned to user
             if($user_auth->is_all_warehouses){
@@ -278,7 +278,6 @@ class ProductsController extends Controller
                 $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
                 $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
             }
-        }
 
 		if ($user_auth->can('products_add')){
 
@@ -824,18 +823,24 @@ class ProductsController extends Controller
             $item['is_imei'] = $Product->is_imei?true:false;
 
             $data = $item;
+            $product_warehouse=product_warehouse::where('deleted_at',null)->where('product_id',$id)->first();
             $categories = Category::where('deleted_at', null)->get(['id', 'name']);
             $brands = Brand::where('deleted_at', null)->get(['id', 'name']);
-
             $product_units = Unit::where('id', $Product->unit_id)
                                 ->orWhere('base_unit', $Product->unit_id)
                                 ->where('deleted_at', null)
                                 ->get();
 
-
             $units = Unit::where('deleted_at', null)
                 ->where('base_unit', null)
                 ->get();
+
+            if($user_auth->is_all_warehouses){
+                $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
+            }else{
+                $warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
+                $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $warehouses_id)->get(['id', 'name']);
+            }
 
 
             return view('products.edit_product',[
@@ -844,6 +849,8 @@ class ProductsController extends Controller
                 'brands' => $brands,
                 'units' => $units,
                 'units_sub' => $product_units,
+                'warehouses'=>$warehouses,
+                'product_warehouse'=>$product_warehouse
                 ]);
 
         }
@@ -1282,6 +1289,17 @@ class ProductsController extends Controller
                     $Product->image = $filename;
                     $Product->save();
 
+
+                    $product_id=$Product->id;
+                    $product_warehouse = product_warehouse::where('deleted_at', '=', null)
+                        ->where('warehouse_id', $request->warehouse_id)
+                        ->where('product_id', $product_id)
+                        ->first();
+
+                    if ($product_warehouse) {
+                        $product_warehouse->qte += $request->qty;
+                        $product_warehouse->save();
+                    }
                 }, 10);
 
                 return response()->json(['success' => true]);

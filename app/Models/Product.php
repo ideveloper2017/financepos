@@ -79,4 +79,8 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
+    public function product_warehouse(){
+        return $this->belongsTo(product_warehouse::class,'product_id','id');
+    }
+
 }

@@ -63,7 +63,7 @@
                             </v-select>
                         </div>
 
-                       
+
 
                         <div class="form-group col-md-4" style="display:none">
                             <label for="stock_alert">{{ __('translate.Order_Tax') }} </label>
@@ -149,7 +149,7 @@
                                 @{{ errors.cost[0] }}
                             </span>
                         </div>
-    
+
                         <div class="form-group col-md-4" v-if="product.type == 'is_single' || product.type == 'is_service'">
                             <label for="price">{{ __('translate.Product_Price') }} <span class="field_required">*</span></label>
                             <input type="text" class="form-control" id="price" placeholder="{{ __('translate.Enter_Product_Price') }}"
@@ -218,7 +218,7 @@
                                     </a>
                                 </div>
                             </div>
-        
+
                             <div class="col-md-9 mb-2 " v-if="product.type == 'is_variant'">
                                 <div class="table-responsive">
                                     <table class="table table-hover table-sm">
@@ -259,6 +259,24 @@
                                     </table>
                                 </div>
                             </div>
+
+                        <div class="form-group col-md-6">
+                            {{--                            <validation-provider name="warehouse" rules="required" v-slot="{ valid, errors }">--}}
+                            <label>{{ __('translate.warehouse') }} <span class="field_required">*</span></label>
+                            <v-select @input="Selected_Warehouse"
+                                      placeholder="{{ __('translate.Choose_Warehouse') }}" v-model="product_warehouse.warehouse_id"
+                                      :reduce="(option) => option.value"
+                                      :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))">
+                            </v-select>
+                            <span class="error">@{{ errors[0] }}</span>
+                            {{--                            </validation-provider>--}}
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="qtt">{{ __('translate.Qty') }} </label>
+                            <input type="text" class="form-control" id="qty"
+                                   placeholder="{{ __('translate.Qty') }}" v-model="product_warehouse.qte">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -304,20 +322,20 @@
 <script type="text/javascript">
     $(function () {
           "use strict";
-  
+
           $(document).on('keyup keypress', 'form input[type="text"]', function(e) {
               if(e.keyCode == 13) {
               e.preventDefault();
               return false;
               }
           });
-  
+
       });
 </script>
 
 <script>
     Vue.component('v-select', VueSelect.VueSelect)
-  
+
       var app = new Vue({
           el: '#section_edit_product',
           components: {
@@ -329,15 +347,23 @@
               SubmitProcessing:false,
               data: new FormData(),
               errors:[],
+              warehouses: @json($warehouses),
               categories: @json($categories),
               units: @json($units),
               units_sub: @json($units_sub),
               brands: @json($brands),
               product: @json($product),
+              product_warehouse: @json($product_warehouse),
               variants: @json($product['ProductVariant']),
+              adjustment: {
+                  id: "",
+                  notes: "",
+                  warehouse_id: "",
+                  date: moment().format('YYYY-MM-DD HH:mm'),
+              },
           },
-  
-         
+
+
           methods: {
 
             //------ Generate code
@@ -357,6 +383,25 @@
                 }
             },
 
+              Selected_Warehouse(value) {
+                  this.search_input= '';
+                  this.product_filter = [];
+                  this.Get_Products_By_Warehouse(value);
+              },
+
+              Get_Products_By_Warehouse(id) {
+                  // Start the progress bar.
+                  NProgress.start();
+                  NProgress.set(0.1);
+                  axios
+                      .get("/products/products_by_Warehouse/" + id + "?stock=" + 0 + "&product_service=" + 0)
+                      .then(response => {
+                          this.products = response.data;
+                          NProgress.done();
+                      })
+                      .catch(error => {
+                      });
+              },
 
             formatDate(d){
                 var m1 = d.getMonth()+1;
@@ -365,8 +410,8 @@
                 var d2 = d1 < 10 ? '0' + d1 : d1;
                 return [d.getFullYear(), m2, d2].join('-');
             },
-  
-              
+
+
             add_variant(tag) {
                 if (
                     this.variants.length > 0 &&
@@ -386,10 +431,10 @@
                     }else{
 
                         toastr.error('Please Enter the Variant');
-                        
+
                     }
                 }
-            
+
             },
 
 
@@ -402,21 +447,21 @@
             }
             },
 
-  
-            
+
+
               onFileSelected(e){
                   let file = e.target.files[0];
                   this.product.image = file;
               },
-  
+
                //---------------------- Get Sub Units with Unit id ------------------------------\\
               Get_Units_SubBase(value) {
               axios
                   .get("/products/Get_Units_SubBase?id=" + value)
                   .then(({ data }) => (this.units_sub = data));
               },
-  
-  
+
+
               //---------------------- Event Select Unit Product ------------------------------\\
               Selected_Unit(value) {
               this.units_sub = [];
@@ -424,8 +469,8 @@
               this.product.unit_purchase_id = "";
               this.Get_Units_SubBase(value);
               },
-  
-  
+
+
               //------------------------------ Update_Product ------------------------------\\
               Update_Product() {
 
@@ -438,8 +483,8 @@
                   NProgress.set(0.1);
                   var self = this;
                   self.SubmitProcessing = true;
-                  
-                 
+
+
                 if (self.product.type == 'is_variant' && self.variants.length > 0) {
                     self.product.is_variant = true;
                 }else{
@@ -450,7 +495,7 @@
                 Object.entries(self.product).forEach(([key, value]) => {
                     self.data.append(key, value);
                 });
-                
+
                 //append array variants
                 if (self.variants.length) {
                     for (var i = 0; i < self.variants.length; i++) {
@@ -459,9 +504,9 @@
                     });
                     }
                 }
-  
+
                   self.data.append("_method", "put");
-                  
+
                   // Send Data with axios
                   axios
                       .post("/products/products/" + self.product.id, self.data)
@@ -469,7 +514,7 @@
                       // Complete the animation of theprogress bar.
                       NProgress.done();
                       self.SubmitProcessing = false;
-                      window.location.href = '/products/products'; 
+                      window.location.href = '/products/products';
                       toastr.success('{{ __('translate.Updated_in_successfully') }}');
                       self.errors = {};
                       })
@@ -477,7 +522,7 @@
                         NProgress.done();
                         self.SubmitProcessing = false;
 
-                        
+
                         if (error.response.status == 422) {
                             self.errors = error.response.data.errors;
                             toastr.error('{{ __('translate.There_was_something_wronge') }}');
@@ -486,19 +531,19 @@
                         if(self.errors.variants && self.errors.variants.length > 0){
                             toastr.error(self.errors.variants[0]);
                         }
-                        
+
                       });
                     }
               }
-  
-            
+
+
           },
           //-----------------------------Autoload function-------------------
           created() {
           }
-  
+
       })
-  
+
 </script>
 
 @endsection
