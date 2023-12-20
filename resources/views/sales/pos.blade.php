@@ -74,47 +74,48 @@
                   ])
                 </span>
               </div>
+                <div class="filter-box">
+                    <validation-provider name="Customer" rules="required" v-slot="{ valid, errors }">
+                        <label>{{ __('translate.Customer') }} <span class="field_required">*</span></label>
+                        <v-select @input="Selected_Customer" v-model="sale.client_id"
+                                  placeholder="{{ __('translate.Choose_Customer') }}" :reduce="username => username.value"
+                                  :options="clients.map(clients => ({label: clients.username, value: clients.id}))">
+
+                        </v-select>
+                        <span class="error">@{{ errors[0] }}</span>
+                    </validation-provider>
+                </div>
+
+                <!-- warehouse -->
+                <div class="filter-box">
+                    <validation-provider name="warehouse" rules="required" v-slot="{ valid, errors }">
+                        <label>{{ __('translate.warehouse') }} <span class="field_required">*</span></label>
+                        <v-select @input="Selected_Warehouse" :disabled="details.length > 0"
+                                  placeholder="{{ __('translate.Choose_Warehouse') }}" v-model="sale.warehouse_id"
+                                  :reduce="(option) => option.value"
+                                  :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))">
+                        </v-select>
+                        <span class="error">@{{ errors[0] }}</span>
+                    </validation-provider>
+                </div>
             </div>
           </div>
 
           <div class="row pos-card-left">
             <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-              
+
               <validation-observer ref="create_pos">
                 <form>
 
                   <!-- Customer -->
-                  <div class="filter-box">
-                    <validation-provider name="Customer" rules="required" v-slot="{ valid, errors }">
-                      <label>{{ __('translate.Customer') }} <span class="field_required">*</span></label>
-                      <v-select @input="Selected_Customer" v-model="sale.client_id"
-                        placeholder="{{ __('translate.Choose_Customer') }}" :reduce="username => username.value"
-                        :options="clients.map(clients => ({label: clients.username, value: clients.id}))">
 
-                      </v-select>
-                      <span class="error">@{{ errors[0] }}</span>
-                    </validation-provider>
-                  </div>
-
-                  <!-- warehouse -->
-                  <div class="filter-box">
-                    <validation-provider name="warehouse" rules="required" v-slot="{ valid, errors }">
-                      <label>{{ __('translate.warehouse') }} <span class="field_required">*</span></label>
-                      <v-select @input="Selected_Warehouse" :disabled="details.length > 0"
-                        placeholder="{{ __('translate.Choose_Warehouse') }}" v-model="sale.warehouse_id"
-                        :reduce="(option) => option.value"
-                        :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))">
-                      </v-select>
-                      <span class="error">@{{ errors[0] }}</span>
-                    </validation-provider>
-                  </div>
 
                   <!-- card -->
                   <div class="card m-0 card-list-products">
                     <div class="d-flex align-items-center justify-content-between">
                       <h6 class="fw-semibold m-0">{{ __('translate.Cart') }}</h6>
                     </div>
-                   
+
                     <div class="card-items">
                       <div class="cart-item box-shadow-3" v-for="(detail, index) in details" :key="index">
                         <div class="d-flex align-items-center">
@@ -127,7 +128,7 @@
                             @else
                               <h6 class="fw-semibold m-0 font_16">@{{detail.subtotal.toFixed(2)}} {{$currency}}</h6>
                             @endif
-                           
+
                               <a @click="Modal_Updat_Detail(detail)"
                                   class="cursor-pointer ul-link-action text-success"
                                   title="Edit">
@@ -154,11 +155,11 @@
                     </div>
 
                     <div class="cart-summery">
-                      
+
                     <div>
                       <div class="summery-item mb-2 row">
                         <span class="title mr-2 col-lg-12 col-sm-12">{{ __('translate.Shipping') }}</span>
-                        
+
                         <div class="col-lg-8 col-sm-12">
                           <validation-provider name="Shipping" :rules="{ regex: /^\d*\.?\d*$/}"
                             v-slot="validationContext">
@@ -223,8 +224,8 @@
                           @endif
                         </h5>
                       </div>
-                    
-                   
+
+
 
                       <div class="half-circle half-circle-left"></div>
                       <div class="half-circle half-circle-right"></div>
@@ -233,7 +234,7 @@
                     <button @click.prevent="Submit_Pos" class="cart-btn btn btn-primary">
                       {{ __('translate.Pay_Now') }}
                     </button>
-                  
+
                   </div>
 
                 </form>
@@ -380,15 +381,15 @@
                                   <validation-provider name="date" rules="required" v-slot="validationContext">
                                     <div class="form-group">
                                       <label for="picker3">{{ __('translate.Date') }}</label>
-                  
-                                      <input type="text" 
-                                        :state="getValidationState(validationContext)" 
-                                        aria-describedby="date-feedback" 
-                                        class="form-control" 
-                                        placeholder="{{ __('translate.Select_Date') }}"  
-                                        id="datetimepicker" 
+
+                                      <input type="text"
+                                        :state="getValidationState(validationContext)"
+                                        aria-describedby="date-feedback"
+                                        class="form-control"
+                                        placeholder="{{ __('translate.Select_Date') }}"
+                                        id="datetimepicker"
                                         v-model="payment.date">
-                  
+
                                       <span class="error">@{{  validationContext.errors[0] }}</span>
                                     </div>
                                   </validation-provider>
@@ -421,11 +422,11 @@
                                   v-slot="{ valid, errors }">
                                   <label> {{ __('translate.Payment_choice') }}<span
                                           class="field_required">*</span></label>
-                                  <v-select @input="Selected_Payment_Method" 
+                                  <v-select @input="Selected_Payment_Method"
                                         placeholder="{{ __('translate.Choose_Payment_Choice') }}"
                                       :class="{'is-invalid': !!errors.length}"
                                       :state="errors[0] ? false : (valid ? true : null)"
-                                      v-model="payment.payment_method_id" :reduce="(option) => option.value" 
+                                      v-model="payment.payment_method_id" :reduce="(option) => option.value"
                                       :options="payment_methods.map(payment_methods => ({label: payment_methods.title, value: payment_methods.id}))">
 
                                   </v-select>
@@ -435,9 +436,9 @@
 
                           <div class="form-group col-md-6">
                               <label> {{ __('translate.Account') }} </label>
-                              <v-select 
+                              <v-select
                                     placeholder="{{ __('translate.Choose_Account') }}"
-                                  v-model="payment.account_id" :reduce="(option) => option.value" 
+                                  v-model="payment.account_id" :reduce="(option) => option.value"
                                   :options="accounts.map(accounts => ({label: accounts.account_name, value: accounts.id}))">
 
                               </v-select>
@@ -504,7 +505,7 @@
                             :per-page="product_perPage" v-model="product_currentPage">
                         </b-pagination>
                     </div>
-                   
+
                   </div>
                 </div>
 
@@ -538,7 +539,7 @@
                           </li>
                         </ul>
                       </nav>
-                        
+
                   </div>
 
                   <div class="card category-card">
@@ -569,7 +570,7 @@
                           </li>
                         </ul>
                       </nav>
-                      
+
 
                   </div>
                 </div>
@@ -590,7 +591,7 @@
       app.Get_Products_By_Warehouse(app.sale.warehouse_id);
       app.paginate_products(app.product_perPage, 0);
       jQuery("pos-layout").show(); // will fade out the whole DIV that covers the website.
-      
+
   });
 </script>
 
@@ -632,16 +633,16 @@
   <script type="text/javascript">
     $(function () {
         "use strict";
-  
+
         $(document).ready(function () {
-  
+
           flatpickr("#datetimepicker", {
             enableTime: true,
             dateFormat: "Y-m-d H:i"
           });
-  
+
         });
-  
+
       });
   </script>
 
@@ -664,7 +665,7 @@
             currentPage_brand: 1,
             perPage_brand: 4,
             pages_brand: 0,
-            
+
             load_product: true,
             is_data_invoice_pos: false,
             isLoading: true,
@@ -826,7 +827,7 @@
 
         //---------------------------------
 
-          
+
            handleFocus() {
             this.focused = true
           },
@@ -851,7 +852,7 @@
             this.getProducts(page);
           },
 
-         
+
 
           //--- Submit Validate Create Sale
           Submit_Pos() {
@@ -863,13 +864,13 @@
                 NProgress.done();
                 if (this.sale.client_id == "" || this.sale.client_id === null) {
                   toastr.error('Veuillez choisir le client');
-                  
+
                 } else if (
                   this.sale.warehouse_id == "" ||
                   this.sale.warehouse_id === null
                 ) {
                   toastr.error('Veuillez choisir le Magasin');
-                  
+
                 } else {
                   toastr.error('Veuillez remplir correctement le formulaire');
                 }
@@ -900,8 +901,8 @@
                       this.payment.montant = 0;
                   }else{
                       this.CreatePOS();
-                  } 
-                  
+                  }
+
               });
           },
 
@@ -909,11 +910,11 @@
           Verified_paidAmount() {
               if (isNaN(this.payment.montant)) {
                   this.payment.montant = 0;
-                  
+
               } else if (this.payment.montant > this.GrandTotal) {
                   toastr.warning('Le montant à payer est supérieur au total à payer');
                   this.payment.montant = 0;
-              } 
+              }
           },
 
           //---Submit Validation Update Detail
@@ -926,7 +927,7 @@
               }
             });
           },
-         
+
           //------------- Submit Validation Create & Edit Customer
           Submit_Customer() {
             // Start the progress bar.
@@ -941,20 +942,20 @@
               }
             });
           },
-        
+
           //---Validate State Fields
           getValidationState({ dirty, validated, valid = null }) {
             return dirty || validated ? valid : null;
           },
-       
+
           Selected_Customer(value){
             if (value === null) {
               this.sale.client_id = "";
-             
+
             }
 
           },
-         
+
           //---------------------- Event Select Warehouse ------------------------------\\
           Selected_Warehouse(value) {
             if (value === null) {
@@ -969,7 +970,7 @@
             }
           },
 
-          
+
           //---------------------- Event Select Brand ------------------------------\\
           Selected_Brand(value) {
             if (value === null) {
@@ -1005,7 +1006,7 @@
             this.audio.play();
             if (this.details.some(detail => detail.code === code)) {
               this.increment_qty_scanner(code);
-          
+
             } else {
               if (this.details.length > 0) {
                 this.order_detail_id();
@@ -1037,7 +1038,7 @@
               .get("/products/Get_sales_units?id=" + value)
               .then(({ data }) => (this.units = data));
           },
-          
+
           //------ Show Modal Update Detail Product
           Modal_Updat_Detail(detail) {
             NProgress.start();
@@ -1158,7 +1159,7 @@
                 return index == arr.indexOf(el);
             });
           },
-          
+
           //-- check Qty of  details order if Null or zero
           verifiedForm() {
             if (this.details.length <= 0) {
@@ -1196,14 +1197,14 @@
 
             }
           },
-       
-        
+
+
           //----------------------------------Create POS ------------------------------\\
           CreatePOS() {
             if (this.verifiedForm()) {
             NProgress.start();
             NProgress.set(0.1);
-           
+
               this.paymentProcessing = true;
               axios
                 .post("/pos/create_pos", {
@@ -1223,8 +1224,8 @@
                   account_id: this.payment.account_id,
                   payment_notes: this.payment.notes,
                   montant : parseFloat(this.payment.montant).toFixed(2),
-                 
-                 
+
+
                 })
                 .then(response => {
                   if (response.data.success === true) {
@@ -1319,7 +1320,7 @@
                 var grand_total  =  this.GrandTotal.toFixed(2);
                 this.GrandTotal  = parseFloat(grand_total);
             }
-      
+
           },
 
           //-------Verified QTY
@@ -1332,9 +1333,9 @@
                   else if (detail.quantity > detail.current) {
                     toastr.error('{{ __('translate.Low_Stock') }}');
                     this.details[i].quantity = detail.current;
-                    
+
                   } else if(detail.quantity < detail.qty_min){
-                  
+
                       toastr.warning('Minimum Sales Quantity Is' + ' '+ detail.qty_min +' ' + detail.unitSale);
                   } else {
                     this.details[i].quantity = detail.quantity;
@@ -1393,7 +1394,7 @@
             this.CaclulTotal();
             this.$forceUpdate();
           },
-        
+
           //---------- keyup OrderTax
           keyup_OrderTax() {
             if (isNaN(this.sale.tax_rate)) {
@@ -1427,7 +1428,7 @@
               this.CaclulTotal();
             }
           },
-        
+
           //-----------------------------------Delete Detail Product ------------------------------\\
           delete_Product_Detail(id) {
             for (var i = 0; i < this.details.length; i++) {
@@ -1437,7 +1438,7 @@
               }
             }
           },
-         
+
           //------------------------- get Result Value Search Product
           getResultValue(result) {
             return result.code + " " + "(" + result.name + ")";
@@ -1506,10 +1507,10 @@
               toastr.error('{{ __('translate.Please_Select_Warehouse') }}');
             }
           },
-         
+
           //---------------------------------- Check if Product Exist in Order List ---------------------\\
           Check_Product_Exist(product, id) {
-           
+
             if(this.load_product){
               this.load_product = false;
               NProgress.start();
@@ -1549,11 +1550,11 @@
               NProgress.start();
               NProgress.set(0.1);
             axios
-              .get("/pos/autocomplete_product_pos/" + id 
-                  + "?stock=" + 1 
+              .get("/pos/autocomplete_product_pos/" + id
+                  + "?stock=" + 1
                   + "&product_service=" + 1
-                  + "&category_id=" 
-                  + this.category_id 
+                  + "&category_id="
+                  + this.category_id
                   +"&brand_id=" +
                   this.brand_id)
               .then(response => {
@@ -1563,7 +1564,7 @@
                 .catch(error => {
                 });
           },
-         
+
           //------------------------------- Get Products with Filters ------------------------------\\
           getProducts(page = 1) {
             NProgress.start();
@@ -1578,7 +1579,7 @@
                   this.brand_id +
                   "&warehouse_id=" +
                   this.sale.warehouse_id +
-                  "&stock=" + 1 + 
+                  "&stock=" + 1 +
                   "&product_service=" + 1
               )
               .then(response => {
@@ -1591,7 +1592,7 @@
                 NProgress.done();
               });
           },
-        
+
         },
         //-----------------------------Autoload function-------------------
         created() {
@@ -1599,7 +1600,7 @@
         }
 
       })
-  
+
   </script>
 
 
