@@ -56,8 +56,41 @@
 
       <div class="content-section" id="main-pos">
         <section class="pos-content">
+            <div class="row">
+                <div class="col-lg-3">
+                    <!-- Customer -->
+                    <div class="filter-box">
+                        <validation-provider name="Customer" rules="required" v-slot="{ valid, errors }">
+                            <label>{{ __('translate.Customer') }} <span class="field_required">*</span></label>
+                            <v-select @input="Selected_Customer" v-model="sale.client_id"
+                                      placeholder="{{ __('translate.Choose_Customer') }}" :reduce="username => username.value"
+                                      :options="clients.map(clients => ({label: clients.username, value: clients.id}))">
+
+                            </v-select>
+                            <span class="error">@{{ errors[0] }}</span>
+                        </validation-provider>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <!-- warehouse -->
+                    <div class="filter-box">
+                        <validation-provider name="warehouse" rules="required" v-slot="{ valid, errors }">
+                            <label>{{ __('translate.warehouse') }} <span class="field_required">*</span></label>
+                            <v-select @input="Selected_Warehouse" :disabled="details.length > 0"
+                                      placeholder="{{ __('translate.Choose_Warehouse') }}" v-model="sale.warehouse_id"
+                                      :reduce="(option) => option.value"
+                                      :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))">
+                            </v-select>
+                            <span class="error">@{{ errors[0] }}</span>
+                        </validation-provider>
+                    </div>
+                </div>
+            </div>
+
           <div class="d-flex align-items-center">
+
             <div class="w-100 text-gray-600 position-relative">
+
               <div id="autocomplete" class="autocomplete">
                 <input type="text"
                   class="form-control border border-gray-300 py-3 pr-3"
@@ -178,35 +211,6 @@
                     </div>
                   <validation-observer ref="create_pos">
                       <form>
-                          <!-- Customer -->
-                          <div class="filter-box">
-                              <validation-provider name="Customer" rules="required" v-slot="{ valid, errors }">
-                                  <label>{{ __('translate.Customer') }} <span class="field_required">*</span></label>
-                                  <v-select @input="Selected_Customer" v-model="sale.client_id"
-                                            placeholder="{{ __('translate.Choose_Customer') }}" :reduce="username => username.value"
-                                            :options="clients.map(clients => ({label: clients.username, value: clients.id}))">
-
-                                  </v-select>
-                                  <span class="error">@{{ errors[0] }}</span>
-                              </validation-provider>
-                          </div>
-
-                          <!-- warehouse -->
-                          <div class="filter-box">
-                              <validation-provider name="warehouse" rules="required" v-slot="{ valid, errors }">
-                                  <label>{{ __('translate.warehouse') }} <span class="field_required">*</span></label>
-                                  <v-select @input="Selected_Warehouse" :disabled="details.length > 0"
-                                            placeholder="{{ __('translate.Choose_Warehouse') }}" v-model="sale.warehouse_id"
-                                            :reduce="(option) => option.value"
-                                            :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))">
-                                  </v-select>
-                                  <span class="error">@{{ errors[0] }}</span>
-                              </validation-provider>
-                          </div>
-
-                          <!-- card -->
-
-
                               <div class="card-items">
                                   <div class="cart-item box-shadow-3" v-for="(detail, index) in details" :key="index">
                                       <div class="d-flex align-items-center">
@@ -233,68 +237,55 @@
                                           </div>
                                       </div>
                                       <div class="d-flex align-items-center">
-                            @if($symbol_placement == 'before')
-                              <h6 class="fw-semibold m-0 font_16">{{$currency}} @{{detail.subtotal.toFixed(2)}}</h6>
-                            @else
-                              <h6 class="fw-semibold m-0 font_16">@{{detail.subtotal.toFixed(2)}} {{$currency}}</h6>
-                            @endif
-
-                              <a @click="Modal_Updat_Detail(detail)"
-                                  class="cursor-pointer ul-link-action text-success"
-                                  title="Edit">
-                                  <i class="i-Edit"></i>
-                              </a>
-                              <a @click="delete_Product_Detail(detail.detail_id)"
-                                  title="Delete"
-                                  class="cursor-pointer ul-link-action text-danger">
-                                  <i class="i-Close-Window"></i>
-                              </a>
-                          </div>
-                        </div>
-                        <div class="d-flex align-items-center">
                           <span class="increment-decrement btn btn-light rounded-circle"
-                            @click="decrement(detail ,detail.detail_id)">-</span>
-                          <input class="fw-semibold cart-qty m-0 px-2"
-                            @keyup="Verified_Qty(detail,detail.detail_id)" :min="0.00" :max="detail.stock"
-                            v-model.number="detail.quantity">
+                                @click="decrement(detail ,detail.detail_id)">-</span>
+                                          <input class="fw-semibold cart-qty m-0 px-2"
+                                                 @keyup="Verified_Qty(detail,detail.detail_id)" :min="0.00" :max="detail.stock"
+                                                 v-model.number="detail.quantity">
 
-                          <span class="increment-decrement btn btn-light rounded-circle"
-                            @click="increment(detail ,detail.detail_id)">+</span>
-                        </div>
-                      </div>
-                    </div>
+                                          <span class="increment-decrement btn btn-light rounded-circle"
+                                                @click="increment(detail ,detail.detail_id)">+</span>
+                                      </div>
+                                  </div>
+                              </div>
 
                               <div class="cart-summery">
 
-                            <div class="input-group text-right">
-                              <input :state="getValidationState(validationContext)"
-                                aria-describedby="Shipping-feedback" v-model.number="sale.shipping"
-                                @keyup="keyup_Shipping()" type="text" class="no-focus form-control pos-shipping">
-                              <span class="input-group-text cursor-pointer" id="basic-addon3">$</span>
-                            </div>
-                            <span class="error">@{{ validationContext.errors[0] }}</span>
-                          </validation-provider>
-                        </div>
-                      </div>
+{{--                                  <div>--}}
+{{--                                      <div class="summery-item mb-2 row">--}}
+{{--                                          <span class="title mr-2 col-lg-12 col-sm-12">{{ __('translate.Shipping') }}</span>--}}
 
-                      <div class="summery-item mb-2 row">
-                        <span class="title mr-2 col-lg-12 col-sm-12">{{ __('translate.Order_Tax') }}</span>
+{{--                                          <div class="col-lg-8 col-sm-12">--}}
+{{--                                              <validation-provider name="Shipping" :rules="{ regex: /^\d*\.?\d*$/}"--}}
+{{--                                                                   v-slot="validationContext">--}}
 
-                        <div class="col-lg-8 col-sm-12">
-                          <validation-provider name="Order Tax" :rules="{ regex: /^\d*\.?\d*$/}"
-                            v-slot="validationContext">
+{{--                                                  <div class="input-group text-right">--}}
+{{--                                                      <input :state="getValidationState(validationContext)"--}}
+{{--                                                             aria-describedby="Shipping-feedback" v-model.number="sale.shipping"--}}
+{{--                                                             @keyup="keyup_Shipping()" type="text" class="no-focus form-control pos-shipping">--}}
+{{--                                                      <span class="input-group-text cursor-pointer" id="basic-addon3">$</span>--}}
+{{--                                                  </div>--}}
+{{--                                                  <span class="error">@{{ validationContext.errors[0] }}</span>--}}
+{{--                                              </validation-provider>--}}
+{{--                                          </div>--}}
+{{--                                      </div>--}}
 
-                            <div class="input-group text-right">
-                              <input :state="getValidationState(validationContext)"
-                                aria-describedby="OrderTax-feedback" v-model.number="sale.tax_rate"
-                                @keyup="keyup_OrderTax()" type="text" class="no-focus form-control pos-tax">
+{{--                                      <div class="summery-item mb-2 row">--}}
+{{--                                          <span class="title mr-2 col-lg-12 col-sm-12">{{ __('translate.Order_Tax') }}</span>--}}
+{{--                                          <div class="col-lg-8 col-sm-12">--}}
+{{--                                              <validation-provider name="Order Tax" :rules="{ regex: /^\d*\.?\d*$/}"--}}
+{{--                                                                   v-slot="validationContext">--}}
+{{--                                                  <div class="input-group text-right">--}}
+{{--                                                      <input :state="getValidationState(validationContext)"--}}
+{{--                                                             aria-describedby="OrderTax-feedback" v-model.number="sale.tax_rate"--}}
+{{--                                                             @keyup="keyup_OrderTax()" type="text" class="no-focus form-control pos-tax">--}}
 
-                              <span class="input-group-text cursor-pointer" id="basic-addon3">%</span>
-                            </div>
-                            <span class="error">@{{ validationContext.errors[0] }}</span>
-                          </validation-provider>
-                        </div>
-                      </div>
+{{--                                                      <span class="input-group-text cursor-pointer" id="basic-addon3">%</span>--}}
+{{--                                                  </div>--}}
+{{--                                                  <span class="error">@{{ validationContext.errors[0] }}</span>--}}
+{{--                                              </validation-provider>--}}
+{{--                                          </div>--}}
+{{--                                      </div>--}}
 
 {{--                                      <div class="summery-item mb-3 row">--}}
 {{--                                          <span class="title mr-2 col-lg-12 col-sm-12">{{ __('translate.Discount') }}</span>--}}
@@ -1609,4 +1600,3 @@
 </body>
 
 </html>
-
