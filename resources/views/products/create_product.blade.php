@@ -15,7 +15,7 @@
 <!-- begin::main-row -->
 <div class="row" id="section_create_product">
     <div class="col-lg-12 mb-3">
-
+        <validation-observer ref="Create_product">
         <!--begin::form-->
         <form @submit.prevent="Create_Product()">
             <div class="card">
@@ -66,7 +66,7 @@
                             </v-select>
                         </div>
 
-                       
+
 
                         <div class="form-group col-md-4" style="display:none">
                             <label for="stock_alert">{{ __('translate.Order_Tax') }} </label>
@@ -138,7 +138,7 @@
                                 @{{ errors.cost[0] }}
                             </span>
                         </div>
-    
+
                         <div class="form-group col-md-4" v-if="product.type == 'is_single' || product.type == 'is_service'">
                             <label for="price">{{ __('translate.Product_Price') }} <span class="field_required">*</span></label>
                             <input type="text" class="form-control" id="price" placeholder="{{ __('translate.Enter_Product_Price') }}"
@@ -207,7 +207,7 @@
                                 </a>
                             </div>
                         </div>
-    
+
                         <div class="col-md-9 mb-2 " v-if="product.type == 'is_variant'">
                             <div class="table-responsive">
                                 <table class="table table-hover table-sm">
@@ -248,6 +248,23 @@
                                 </table>
                             </div>
                         </div>
+                        <div class="form-group col-md-6">
+                            {{--                            <validation-provider name="warehouse" rules="required" v-slot="{ valid, errors }">--}}
+                            <label>{{ __('translate.warehouse') }} <span class="field_required">*</span></label>
+                            <v-select @input="Selected_Warehouse"
+                                      placeholder="{{ __('translate.Choose_Warehouse') }}" v-model="product.warehouse_id"
+                                      :reduce="(option) => option.value"
+                                      :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))">
+                            </v-select>
+                            <span class="error">@{{ errors[0] }}</span>
+                            {{--                            </validation-provider>--}}
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="qtt">{{ __('translate.Qty') }} </label>
+                            <input type="text" class="form-control" id="qty"
+                                   placeholder="{{ __('translate.Qty') }}" v-model="product.qty">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -278,6 +295,7 @@
         </form>
 
         <!-- end::form -->
+        </validation-observer>
     </div>
 
 </div>
@@ -287,8 +305,8 @@
 <script src="{{asset('assets/js/nprogress.js')}}"></script>
 <script src="{{asset('assets/js/bootstrap-tagsinput.js')}}"></script>
 <script src="{{asset('assets/js/datepicker.min.js')}}"></script>
+<script src="{{asset('assets/js/autocomplete.js')}}"></script>
 <script src="{{asset('assets/js/vendor/vuejs-datepicker/vuejs-datepicker.min.js')}}"></script>
-
 <script type="text/javascript">
     $(function () {
           "use strict";
@@ -299,13 +317,14 @@
               return false;
               }
           });
-  
+
       });
 </script>
 
 <script>
     Vue.component('v-select', VueSelect.VueSelect)
-  
+    Vue.component('validation-provider', VeeValidate.ValidationProvider);
+    Vue.component('validation-observer', VeeValidate.ValidationObserver);
       var app = new Vue({
           el: '#section_create_product',
           components: {
@@ -317,11 +336,18 @@
               SubmitProcessing:false,
               data: new FormData(),
               errors:[],
+              warehouses: @json($warehouses),
               categories: @json($categories),
               units: @json($units),
               units_sub: [],
               brands: @json($brands),
               variants: [],
+              adjustment: {
+                  id: "",
+                  notes: "",
+                  warehouse_id: "",
+                  date: moment().format('YYYY-MM-DD HH:mm'),
+              },
               product: {
                   type: "is_single",
                   name: "",
@@ -346,11 +372,13 @@
                   promo_price:'',
                   promo_start_date: new Date().toISOString().slice(0, 10),
                   promo_end_date:'',
+                  warehouse_id:"",
+                  qty:0
               },
           },
-  
-         
-         
+
+
+
           methods: {
 
               //------ Generate code
@@ -380,22 +408,43 @@
                     }else{
 
                         toastr.error('Please Enter the Variant');
-                        
+
                     }
                 }
             },
 
 
+
+              Selected_Warehouse(value) {
+                  this.search_input= '';
+                  this.product_filter = [];
+                  this.Get_Products_By_Warehouse(value);
+              },
+
+              Get_Products_By_Warehouse(id) {
+                  // Start the progress bar.
+                  NProgress.start();
+                  NProgress.set(0.1);
+                  axios
+                      .get("/products/products_by_Warehouse/" + id + "?stock=" + 0 + "&product_service=" + 0)
+                      .then(response => {
+                          this.products = response.data;
+                          NProgress.done();
+                      })
+                      .catch(error => {
+                      });
+              },
+
             //-----------------------------------Delete variant------------------------------\\
             delete_variant(var_id) {
-            
+
             for (var i = 0; i < this.variants.length; i++) {
                 if (var_id === this.variants[i].var_id) {
                 this.variants.splice(i, 1);
                 }
             }
             },
-  
+
 
             formatDate(d){
                 var m1 = d.getMonth()+1;
@@ -409,21 +458,21 @@
             getValidationState({ dirty, validated, valid = null }) {
                 return dirty || validated ? valid : null;
             },
-  
-            
+
+
               onFileSelected(e){
                   let file = e.target.files[0];
                   this.product.image = file;
               },
-  
+
                //---------------------- Get Sub Units with Unit id ------------------------------\\
               Get_Units_SubBase(value) {
               axios
                   .get("/products/Get_Units_SubBase?id=" + value)
                   .then(({ data }) => (this.units_sub = data));
               },
-  
-  
+
+
               //---------------------- Event Select Unit Product ------------------------------\\
               Selected_Unit(value) {
               this.units_sub = [];
@@ -431,8 +480,8 @@
               this.product.unit_purchase_id = "";
               this.Get_Units_SubBase(value);
               },
-  
-  
+
+
             //------------------------------ Create new Product ------------------------------\\
             Create_Product() {
 
@@ -451,7 +500,7 @@
                         self.product.is_variant = false;
                     }
 
-                
+
                     // append objet product
                     Object.entries(self.product).forEach(([key, value]) => {
                         self.data.append(key, value);
@@ -462,7 +511,7 @@
                     if (self.variants.length) {
                         self.data.append("variants", JSON.stringify(self.variants));
                     }
-              
+
                     // Send Data with axios
                     axios
                         .post("/products/products", self.data)
@@ -470,7 +519,7 @@
                         // Complete the animation of theprogress bar.
                         NProgress.done();
                         self.SubmitProcessing = false;
-                        window.location.href = '/products/products'; 
+                        window.location.href = '/products/products';
                         toastr.success('{{ __('translate.Created_in_successfully') }}');
                         self.errors = {};
                         })
@@ -488,19 +537,19 @@
                                 toastr.error(self.errors.variants[0]);
                             }
 
-                            
+
                         });
                     }
               }
-  
-            
+
+
           },
           //-----------------------------Autoload function-------------------
           created() {
           }
-  
+
       })
-  
+
 </script>
 
 @endsection
