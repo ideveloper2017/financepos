@@ -65,15 +65,13 @@
                             <v-select @input="Selected_Customer" v-model="sale.client_id"
                                       placeholder="{{ __('translate.Choose_Customer') }}" :reduce="username => username.value"
                                       :options="clients.map(clients => ({label: clients.username, value: clients.id}))">
-
                             </v-select>
                             <span class="error">@{{ errors[0] }}</span>
                         </validation-provider>
                     </div>
                 </div>
                 <div class="col-lg-3">
-                    <!-- warehouse -->
-                    <div class="filter-box">
+                   <div class="filter-box">
                         <validation-provider name="warehouse" rules="required" v-slot="{ valid, errors }">
                             <label>{{ __('translate.warehouse') }} <span class="field_required">*</span></label>
                             <v-select @input="Selected_Warehouse" :disabled="details.length > 0"
