@@ -82,7 +82,6 @@
               <div class="row">
                 <div class="col-12 col-lg-12">
                   <div class="row">
-
                     <div class="col-lg-2 col-md-6 col-sm-6" v-for="product in products"
                       @click="Check_Product_Exist(product , product.id)">
                       <div class="card product-card cursor-pointer">
@@ -96,7 +95,6 @@
                         </div>
                       </div>
                     </div>
-
                     <div class="d-flex justify-content-center">
                         <b-pagination @change="Product_onPageChanged" :total-rows="product_totalRows"
                             :per-page="product_perPage" v-model="product_currentPage">
@@ -174,6 +172,10 @@
               </div>
             </div>
             <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
+                <div class="card m-0 card-list-products">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h6 class="fw-semibold m-0">{{ __('translate.Cart') }}</h6>
+                    </div>
                   <validation-observer ref="create_pos">
                       <form>
                           <!-- Customer -->
@@ -183,6 +185,7 @@
                                   <v-select @input="Selected_Customer" v-model="sale.client_id"
                                             placeholder="{{ __('translate.Choose_Customer') }}" :reduce="username => username.value"
                                             :options="clients.map(clients => ({label: clients.username, value: clients.id}))">
+
                                   </v-select>
                                   <span class="error">@{{ errors[0] }}</span>
                               </validation-provider>
@@ -202,31 +205,19 @@
                           </div>
 
                           <!-- card -->
-                          <div class="card m-0 card-list-products">
-                              <div class="d-flex align-items-center justify-content-between">
-                                  <h6 class="fw-semibold m-0">{{ __('translate.Cart') }}</h6>
-                              </div>
+
 
                               <div class="card-items">
                                   <div class="cart-item box-shadow-3" v-for="(detail, index) in details" :key="index">
                                       <div class="d-flex align-items-center">
 {{--                                          <img :src="'/images/products/'+detail.image" alt="">--}}
                                           <div>
+                                              <p class="text-gray-600 m-0 font_12">@{{detail.name}}</p>
 
                                               @if($symbol_placement == 'before')
-                                                  <p class="text-gray-600 m-0 font_12">@{{detail.name}}</p>
-
                                                   <h6 class="fw-semibold m-0 font_16">{{$currency}} @{{detail.subtotal.toFixed(2)}}</h6>
                                               @else
-                                                  @{{detail.name}}
-
-                                                  <input class="fw-semibold cart-qty m-0 px-2 border"
-                                                         @keyup="Verified_Qty(detail,detail.detail_id)" :min="0.00" :max="detail.stock"
-                                                         v-model.number="detail.subtotal.toFixed(2)">{{$currency}}
-{{--                                                  <input class="form-control border border-gray-300 py-3 pr-3"--}}
-{{--                                                         @keyup="Verified_Qty(detail,detail.detail_id)" :min="0.00" :max="detail.stock"--}}
-{{--                                                         v-model.number="detail.subtotal.toFixed(2)">--}}
-{{--                                                  <h6 class="fw-semibold m-0 font_16"> {{$currency}}</h6>--}}
+                                                  <h6 class="fw-semibold m-0 font_16">@{{detail.subtotal.toFixed(2)}} {{$currency}}</h6>
                                               @endif
 
                                               <a @click="Modal_Updat_Detail(detail)"
@@ -361,66 +352,66 @@
                                               </div>
 
                                               <!-- Tax Method -->
-                                              <div class="form-group col-md-6">
-                                                  <validation-provider name="Tax Method" rules="required" v-slot="{ valid, errors }">
-                                                      <label>{{ __('translate.Tax_Method') }} <span class="field_required">*</span></label>
-                                                      <v-select placeholder="{{ __('translate.Choose_Method') }}" v-model="detail.tax_method"
-                                                                :reduce="(option) => option.value" :options="
-                        [
-                          {label: 'Exclusive', value: '1'},
-                          {label: 'Inclusive', value: '2'}
-                        ]">
-                                                      </v-select>
-                                                      <span class="error">@{{ errors[0] }}</span>
-                                                  </validation-provider>
-                                              </div>
+{{--                                              <div class="form-group col-md-6">--}}
+{{--                                                  <validation-provider name="Tax Method" rules="required" v-slot="{ valid, errors }">--}}
+{{--                                                      <label>{{ __('translate.Tax_Method') }} <span class="field_required">*</span></label>--}}
+{{--                                                      <v-select placeholder="{{ __('translate.Choose_Method') }}" v-model="detail.tax_method"--}}
+{{--                                                                :reduce="(option) => option.value" :options="--}}
+{{--                        [--}}
+{{--                          {label: 'Exclusive', value: '1'},--}}
+{{--                          {label: 'Inclusive', value: '2'}--}}
+{{--                        ]">--}}
+{{--                                                      </v-select>--}}
+{{--                                                      <span class="error">@{{ errors[0] }}</span>--}}
+{{--                                                  </validation-provider>--}}
+{{--                                              </div>--}}
 
                                               <!-- Tax Rate -->
-                                              <div class="form-group col-md-6">
-                                                  <validation-provider name="Order Tax" :rules="{ required: true , regex: /^\d*\.?\d*$/}"
-                                                                       v-slot="validationContext">
-                                                      <label for="ordertax">{{ __('translate.Order_Tax') }}
-                                                          <span class="field_required">*</span></label>
-                                                      <div class="input-group">
-                                                          <input :state="getValidationState(validationContext)"
-                                                                 aria-describedby="OrderTax-feedback" v-model="detail.tax_percent" type="text"
-                                                                 class="form-control">
-                                                          <div class="input-group-append">
-                                                              <span class="input-group-text">%</span>
-                                                          </div>
-                                                      </div>
-                                                      <span class="error">@{{ validationContext.errors[0] }}</span>
-                                                  </validation-provider>
-                                              </div>
+{{--                                              <div class="form-group col-md-6">--}}
+{{--                                                  <validation-provider name="Order Tax" :rules="{ required: true , regex: /^\d*\.?\d*$/}"--}}
+{{--                                                                       v-slot="validationContext">--}}
+{{--                                                      <label for="ordertax">{{ __('translate.Order_Tax') }}--}}
+{{--                                                          <span class="field_required">*</span></label>--}}
+{{--                                                      <div class="input-group">--}}
+{{--                                                          <input :state="getValidationState(validationContext)"--}}
+{{--                                                                 aria-describedby="OrderTax-feedback" v-model="detail.tax_percent" type="text"--}}
+{{--                                                                 class="form-control">--}}
+{{--                                                          <div class="input-group-append">--}}
+{{--                                                              <span class="input-group-text">%</span>--}}
+{{--                                                          </div>--}}
+{{--                                                      </div>--}}
+{{--                                                      <span class="error">@{{ validationContext.errors[0] }}</span>--}}
+{{--                                                  </validation-provider>--}}
+{{--                                              </div>--}}
 
                                               <!-- Discount Method -->
-                                              <div class="form-group col-md-6">
-                                                  <validation-provider name="Discount_Method" rules="required" v-slot="{ valid, errors }">
-                                                      <label>{{ __('translate.Discount_Method') }} <span
-                                                              class="field_required">*</span></label>
-                                                      <v-select placeholder="{{ __('translate.Choose_Method') }}"
-                                                                v-model="detail.discount_Method" :reduce="(option) => option.value" :options="
-                        [
-                          {label: 'Percent %', value: '1'},
-                          {label: 'Fixed', value: '2'}
-                        ]">
-                                                      </v-select>
-                                                      <span class="error">@{{ errors[0] }}</span>
-                                                  </validation-provider>
-                                              </div>
+{{--                                              <div class="form-group col-md-6">--}}
+{{--                                                  <validation-provider name="Discount_Method" rules="required" v-slot="{ valid, errors }">--}}
+{{--                                                      <label>{{ __('translate.Discount_Method') }} <span--}}
+{{--                                                              class="field_required">*</span></label>--}}
+{{--                                                      <v-select placeholder="{{ __('translate.Choose_Method') }}"--}}
+{{--                                                                v-model="detail.discount_Method" :reduce="(option) => option.value" :options="--}}
+{{--                        [--}}
+{{--                          {label: 'Percent %', value: '1'},--}}
+{{--                          {label: 'Fixed', value: '2'}--}}
+{{--                        ]">--}}
+{{--                                                      </v-select>--}}
+{{--                                                      <span class="error">@{{ errors[0] }}</span>--}}
+{{--                                                  </validation-provider>--}}
+{{--                                              </div>--}}
 
                                               <!-- Discount Rate -->
-                                              <div class="form-group col-md-6">
-                                                  <validation-provider name="Discount" :rules="{ required: true , regex: /^\d*\.?\d*$/}"
-                                                                       v-slot="validationContext">
-                                                      <label for="discount">{{ __('translate.Discount') }}
-                                                          <span class="field_required">*</span></label>
-                                                      <input :state="getValidationState(validationContext)"
-                                                             aria-describedby="Discount-feedback" v-model="detail.discount" type="text"
-                                                             class="form-control">
-                                                      <span class="error">@{{ validationContext.errors[0] }}</span>
-                                                  </validation-provider>
-                                              </div>
+{{--                                              <div class="form-group col-md-6">--}}
+{{--                                                  <validation-provider name="Discount" :rules="{ required: true , regex: /^\d*\.?\d*$/}"--}}
+{{--                                                                       v-slot="validationContext">--}}
+{{--                                                      <label for="discount">{{ __('translate.Discount') }}--}}
+{{--                                                          <span class="field_required">*</span></label>--}}
+{{--                                                      <input :state="getValidationState(validationContext)"--}}
+{{--                                                             aria-describedby="Discount-feedback" v-model="detail.discount" type="text"--}}
+{{--                                                             class="form-control">--}}
+{{--                                                      <span class="error">@{{ validationContext.errors[0] }}</span>--}}
+{{--                                                  </validation-provider>--}}
+{{--                                              </div>--}}
 
                                               <!-- Unit Sale -->
                                               <div class="form-group col-md-6" v-if="detail.product_type != 'is_service'">
