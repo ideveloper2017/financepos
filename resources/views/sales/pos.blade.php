@@ -1053,8 +1053,6 @@
               $('#form_Update_Detail').modal('show');
             }, 1000);
           },
-
-
           //------ Submit Update Detail Product
           Update_Detail() {
             NProgress.start();
@@ -1590,9 +1588,6 @@
       })
 
   </script>
-
-
-
 </body>
 
 </html>
