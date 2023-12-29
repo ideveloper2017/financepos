@@ -56,8 +56,38 @@
 
       <div class="content-section" id="main-pos">
         <section class="pos-content">
+            <div class="row">
+                <div class="col-lg-3">
+                    <!-- Customer -->
+                    <div class="filter-box">
+                        <validation-provider name="Customer" rules="required" v-slot="{ valid, errors }">
+                            <label>{{ __('translate.Customer') }} <span class="field_required">*</span></label>
+                            <v-select @input="Selected_Customer" v-model="sale.client_id"
+                                      placeholder="{{ __('translate.Choose_Customer') }}" :reduce="username => username.value"
+                                      :options="clients.map(clients => ({label: clients.username, value: clients.id}))">
+                            </v-select>
+                            <span class="error">@{{ errors[0] }}</span>
+                        </validation-provider>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                   <div class="filter-box">
+                        <validation-provider name="warehouse" rules="required" v-slot="{ valid, errors }">
+                            <label>{{ __('translate.warehouse') }} <span class="field_required">*</span></label>
+                            <v-select @input="Selected_Warehouse" :disabled="details.length > 0"
+                                      placeholder="{{ __('translate.Choose_Warehouse') }}" v-model="sale.warehouse_id"
+                                      :reduce="(option) => option.value"
+                                      :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))">
+                            </v-select>
+                            <span class="error">@{{ errors[0] }}</span>
+                        </validation-provider>
+                    </div>
+                </div>
+            </div>
           <div class="d-flex align-items-center">
+
             <div class="w-100 text-gray-600 position-relative">
+
               <div id="autocomplete" class="autocomplete">
                 <input type="text"
                   class="form-control border border-gray-300 py-3 pr-3"
@@ -178,35 +208,6 @@
                     </div>
                   <validation-observer ref="create_pos">
                       <form>
-                          <!-- Customer -->
-                          <div class="filter-box">
-                              <validation-provider name="Customer" rules="required" v-slot="{ valid, errors }">
-                                  <label>{{ __('translate.Customer') }} <span class="field_required">*</span></label>
-                                  <v-select @input="Selected_Customer" v-model="sale.client_id"
-                                            placeholder="{{ __('translate.Choose_Customer') }}" :reduce="username => username.value"
-                                            :options="clients.map(clients => ({label: clients.username, value: clients.id}))">
-
-                                  </v-select>
-                                  <span class="error">@{{ errors[0] }}</span>
-                              </validation-provider>
-                          </div>
-
-                          <!-- warehouse -->
-                          <div class="filter-box">
-                              <validation-provider name="warehouse" rules="required" v-slot="{ valid, errors }">
-                                  <label>{{ __('translate.warehouse') }} <span class="field_required">*</span></label>
-                                  <v-select @input="Selected_Warehouse" :disabled="details.length > 0"
-                                            placeholder="{{ __('translate.Choose_Warehouse') }}" v-model="sale.warehouse_id"
-                                            :reduce="(option) => option.value"
-                                            :options="warehouses.map(warehouses => ({label: warehouses.name, value: warehouses.id}))">
-                                  </v-select>
-                                  <span class="error">@{{ errors[0] }}</span>
-                              </validation-provider>
-                          </div>
-
-                          <!-- card -->
-
-
                               <div class="card-items">
                                   <div class="cart-item box-shadow-3" v-for="(detail, index) in details" :key="index">
                                       <div class="d-flex align-items-center">
