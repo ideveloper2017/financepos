@@ -31,8 +31,8 @@
               <tr>
                 <th>ID</th>
                 <th>{{ __('translate.Image') }}</th>
-                <th>{{ __('translate.type') }}</th>
-                <th>{{ __('translate.Name') }}</th>
+                <th>{{ __('translate.Size') }}</th>
+                <th>{{ __('translate.Product_Name') }}</th>
                 <th>{{ __('translate.Code') }}</th>
                 <th>{{ __('translate.Category') }}</th>
                 <th>{{ __('translate.Brand') }}</th>
@@ -176,7 +176,7 @@
                 columns: [
                     {data: 'id' , className: "d-none"},
                     {data: 'image'},
-                    {data: 'type'},
+                    {data: 'model'},
                     {data: 'name'},
                     {data: 'code'},
                     {data: 'category'},

@@ -57,11 +57,11 @@ if ($installed === true) {
             Route::post('/update_database/lastStep', [
                 'as' => 'update_lastStep', 'uses' => 'UpdateController@lastStep',
             ]);
-            
+
         });
 
         Route::middleware(['auth', 'Is_Active'])->group(function () {
-         
+
             Route::get('dashboard/employee', "DashboardController@dashboard_employee")->name('dashboard_employee');
 
             // Route::prefix('inventory')->group(function() {
@@ -71,7 +71,7 @@ if ($installed === true) {
 
                 //-------------------------------  Reports ------------------------\\
                 Route::prefix('reports')->group(function() {
-                    
+
                     Route::get('report_profit', 'ReportController@report_profit')->name('report_profit');
                     Route::get('report_profit/{start_date}/{end_date}/{warehouse}', 'ReportController@report_profit_filter')->name('report_profit_filter');
 
@@ -86,7 +86,7 @@ if ($installed === true) {
 
                     Route::get('report_providers', 'ReportController@report_providers')->name('report_providers');
                     Route::post('get_report_providers_datatable', 'ReportController@get_report_providers_datatable')->name('get_report_providers_datatable');
-                    
+
                     Route::get('sale_report', 'ReportController@sale_report')->name('sale_report');
                     Route::post('get_report_sales_datatable', 'ReportController@get_report_sales_datatable')->name('get_report_sales_datatable');
                     Route::get('report_monthly_sale', 'ReportController@report_monthly_sale')->name('report_monthly_sale');
@@ -106,10 +106,10 @@ if ($installed === true) {
                     Route::get('payment_sale_return', 'ReportController@payment_sale_return_report')->name('payment_sale_return_report');
 
                     Route::get('payment_purchase_return', 'ReportController@payment_purchase_return_report')->name('payment_purchase_return_report');
-                    
+
                     Route::get('reports_quantity_alerts', 'ReportController@reports_quantity_alerts')->name('reports_quantity_alerts');
                 });
-                
+
                 //------------------------------- products--------------------------\\
                 Route::prefix('products')->group(function() {
                     Route::resource('products', 'ProductsController');
@@ -123,7 +123,7 @@ if ($installed === true) {
 
                     //------------------------------- categories--------------------------\\
                     Route::resource('categories', 'CategoriesController');
-            
+
                     //------------------------------- brands--------------------------\\
                     Route::resource('brands', 'BrandsController');
 
@@ -131,24 +131,24 @@ if ($installed === true) {
                     Route::resource('units', 'UnitsController');
                     Route::get('Get_Units_SubBase', 'UnitsController@Get_Units_SubBase');
                     Route::get('Get_sales_units', 'UnitsController@Get_sales_units');
-            
+
                     //------------------------------- warehouses--------------------------\\
                     Route::resource('warehouses', 'WarehousesController');
                 });
 
                 //------------------------------- adjustments--------------------------\\
                 Route::resource('adjustment/adjustments', 'AdjustmentsController');
-    
-        
+
+
                 //------------------------------- quotations --------------------------\\
                 Route::prefix('quotation')->group(function() {
                     Route::resource('quotations', 'QuotationsController');
                     Route::post('get_quotations_datatable', 'QuotationsController@get_quotations_datatable')->name('get_quotations_datatable');
                 });
-                
+
                 Route::post('quotations/sendQuote/email', 'QuotationsController@SendEmail');
                 Route::get('quotations/generate_sale/{id}', 'QuotationsController@generate_sale');
-        
+
                 //------------------------------- purchases --------------------------\\
                 Route::prefix('purchase')->group(function() {
                     Route::resource('purchases', 'PurchasesController');
@@ -158,12 +158,11 @@ if ($installed === true) {
                     Route::post('purchases/send/email', 'PurchasesController@Send_Email');
                     Route::get('get_Products_by_purchase/{id}', 'PurchasesController@get_Products_by_purchase');
                 });
-        
+
                 //------------------------------- Sales --------------------------\\
                 Route::prefix('sale')->group(function() {
                     Route::resource('sales', 'SalesController');
                     Route::post('get_sales_datatable', 'SalesController@get_sales_datatable')->name('sales_datatable');
-
                     Route::post('sales/send/email', 'SalesController@Send_Email');
                     Route::get('sales/payments/{id}', 'SalesController@Payments_Sale');
                     Route::get('get_Products_by_sale/{id}', 'SalesController@get_Products_by_sale');
@@ -180,52 +179,50 @@ if ($installed === true) {
 
                 //------------------------------- transfers --------------------------\\
                 Route::resource('transfer/transfers', 'TransfersController');
-        
+
                 //------------------------------- Sales Return --------------------------\\
                 Route::prefix('sales-return')->group(function() {
                     Route::resource('returns_sale', 'SalesReturnController');
                     Route::get('returns/sale/payment/{id}', 'SalesReturnController@Payment_Returns');
-
                     Route::get('add_returns_sale/{id}', 'SalesReturnController@create_sell_return')->name('create_sell_return');
                     Route::get('edit_returns_sale/{id}/{sale_id}', 'SalesReturnController@edit_sell_return')->name('edit_sell_return');
                 });
-        
+
                 //------------------------------- Purchases Return --------------------------\\
                 Route::prefix('purchase-return')->group(function() {
                     Route::resource('returns_purchase', 'PurchasesReturnController');
                     Route::post('returns/purchase/send/email', 'PurchasesReturnController@Send_Email');
                     Route::get('returns/purchase/payment/{id}', 'PurchasesReturnController@Payment_Returns');
-
                     Route::get('add_returns_purchase/{id}', 'PurchasesReturnController@create_purchase_return')->name('create_purchase_return');
                     Route::get('edit_returns_purchase/{id}/{purchase_id}', 'PurchasesReturnController@edit_purchase_return')->name('edit_purchase_return');
                 });
-                
+
                 //------------------------------- payment purchase --------------------------\\
-        
+
                 Route::resource('payment/purchase', 'PaymentPurchasesController');
                 Route::get('payment/purchase/get_data_create/{id}', 'PaymentPurchasesController@get_data_create');
                 Route::post('payment/purchase/send/email', 'PaymentPurchasesController@SendEmail');
-        
+
                 //------------------------------- payment sale --------------------------\\
-        
+
                 Route::resource('payment/sale', 'PaymentSalesController');
                 Route::get('payment/sale/get_data_create/{id}', 'PaymentSalesController@get_data_create');
                 Route::post('payment/sale/send/email', 'PaymentSalesController@SendEmail');
-        
+
                 //------------------------------- Payment Sale Returns --------------------------\\
-        
+
                 Route::resource('payment_returns_sale', 'PaymentSaleReturnsController');
                 Route::get('payment/returns_sale/get_data_create/{id}', 'PaymentSaleReturnsController@get_data_create');
                 Route::post('payment/returns_sale/send/email', 'PaymentSaleReturnsController@SendEmail');
 
                 //------------------------------- Payments Purchase Returns --------------------------\\
-        
+
                 Route::resource('payment_returns_purchase', 'PaymentPurchaseReturnsController');
                 Route::get('payment/returns_purchase/get_data_create/{id}', 'PaymentPurchaseReturnsController@get_data_create');
                 Route::post('payment/returns_purchase/send/email', 'PaymentPurchaseReturnsController@SendEmail');
 
                 //------------------------------- suppliers --------------------------\\
-        
+
                  Route::resource('people/suppliers', 'SuppliersController');
                  Route::post('get_suppliers_datatable', 'SuppliersController@get_suppliers_datatable')->name('get_suppliers_datatable');
 
@@ -237,7 +234,7 @@ if ($installed === true) {
                  Route::post('providers_pay_return_due', 'SuppliersController@providers_pay_return_due');
 
                  //------------------------------- clients --------------------------\\
-        
+
                  Route::resource('people/clients', 'ClientController');
                  Route::post('get_clients_datatable', 'ClientController@get_clients_datatable')->name('clients_datatable');
 
@@ -259,14 +256,14 @@ if ($installed === true) {
                     Route::resource('permissions', 'PermissionsController');
                 });
                 //-------------------------------  --------------------------\\
-        
+
                 //------------------------------- Profile --------------------------\\
                 //----------------------------------------------------------------\\
                 Route::put('updateProfile/{id}', 'ProfileController@updateProfile');
                 Route::resource('profile', 'ProfileController');
 
                 //-------------------------------  Print & PDF ------------------------\\
-        
+
                 Route::get('Sale_PDF/{id}', 'SalesController@Sale_PDF');
                 Route::get('Quote_PDF/{id}', 'QuotationsController@Quotation_pdf');
                 Route::get('Purchase_PDF/{id}', 'PurchasesController@Purchase_pdf');
@@ -298,27 +295,27 @@ if ($installed === true) {
 
                      //------------------------------- SMS Settings ------------------------\\
 
-    
+
                      Route::get('sms_settings', 'Sms_SettingsController@get_sms_config');
                      Route::put('update_Default_SMS', 'Sms_SettingsController@update_Default_SMS');
                      Route::post('update_twilio_config', 'Sms_SettingsController@update_twilio_config');
                      Route::post('update_nexmo_config', 'Sms_SettingsController@update_nexmo_config');
                      Route::post('update_infobip_config', 'Sms_SettingsController@update_infobip_config');
- 
+
                      // notifications_template
                      Route::get('sms_template', 'Notifications_Template@get_sms_template');
                      Route::put('update_sms_body', 'Notifications_Template@update_sms_body');
 
                      Route::get('emails_template', 'Notifications_Template@get_emails_template');
                      Route::put('update_custom_email', 'Notifications_Template@update_custom_email');
-                     
+
                     // update_backup_settings
                      Route::post('update_backup_settings', 'SettingController@update_backup_settings');
 
                 });
 
                 Route::get('GenerateBackup', 'BackupController@GenerateBackup');
-                
+
                 //------------------------------- clear_cache --------------------------\\
 
                 Route::get("clear_cache", "SettingController@Clear_Cache");
@@ -350,7 +347,7 @@ if ($installed === true) {
           Route::get('sell_url/{id}', 'SalesController@Sale_PDF');
           Route::get('purchase_url/{id}', 'PurchasesController@Purchase_pdf');
           Route::get('quotation_url/{id}', 'QuotationsController@Quotation_pdf');
-   
+
 
     });
 
@@ -360,8 +357,8 @@ if ($installed === true) {
             function () {
                     return redirect('/setup');
             })->where('vue', '^(?!setup).*$');
-    
-            
+
+
             Route::get('/setup', [
                 'uses' => 'SetupController@viewCheck',
             ])->name('setup');
@@ -423,8 +420,8 @@ if ($installed === true) {
                 return redirect('/setup', 301);
             });
 
-    } 
-    
+    }
+
 
 
 

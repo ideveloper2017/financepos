@@ -29,6 +29,16 @@
                             </span>
                         </div>
 
+
+                        <div class="form-group col-md-4">
+                            <label for="name">{{ __('translate.Size') }} <span
+                                    class="field_required">*</span></label>
+                            <input type="text" class="form-control" id="model"
+                                   placeholder="{{ __('translate.Enter_Size') }}" v-model="product.model">
+                            <span class="error" v-if="errors && errors.model">
+                                @{{ errors.name[0] }}
+                            </span>
+                        </div>
                         <div class="form-group col-md-4">
                             <label for="code">{{ __('translate.Product_Code') }} <span class="field_required">*</span></label>
 

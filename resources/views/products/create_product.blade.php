@@ -26,12 +26,21 @@
                             <label for="name">{{ __('translate.Product_Name') }} <span
                                     class="field_required">*</span></label>
                             <input type="text" class="form-control" id="name"
-                                placeholder="{{ __('translate.Enter_Name_Product') }}" v-model="product.name">
+                                placeholder="{{ __('translate.Enter_Name_Product') }}" v-model="product.name" autocomplete="false">
                             <span class="error" v-if="errors && errors.name">
                                 @{{ errors.name[0] }}
                             </span>
                         </div>
 
+                        <div class="form-group col-md-4">
+                            <label for="name">{{ __('translate.Size') }} <span
+                                    class="field_required">*</span></label>
+                            <input type="text" class="form-control" id="model"
+                                   placeholder="{{ __('translate.Enter_Size') }}" v-model="product.model">
+                            <span class="error" v-if="errors && errors.model">
+                                @{{ errors.name[0] }}
+                            </span>
+                        </div>
                         <div class="form-group col-md-4">
                             <label for="code">{{ __('translate.Product_Code') }} <span class="field_required">*</span></label>
 
@@ -351,6 +360,7 @@
               product: {
                   type: "is_single",
                   name: "",
+                  model: "",
                   code: "",
                   Type_barcode: "",
                   cost: "",
@@ -406,9 +416,7 @@
                         this.variants.push(variant_tag);
                         this.tag = "";
                     }else{
-
                         toastr.error('Please Enter the Variant');
-
                     }
                 }
             },
