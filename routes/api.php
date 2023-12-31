@@ -24,24 +24,22 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //get categories
 Route::get('categories', function(Request $request) {
     $perPage = $request->perPage ?: 7;
-    $categories = Category::where('deleted_at', '=', null)
-      ->paginate($perPage, ['id', 'name']);
+    $categories = Category::where('deleted_at', '=', null)->get();
     return response()->json([
-      'data' => $categories->items(),
-      'current_page' => $categories->currentPage(),
-      'last_page' => $categories->lastPage()
+      'data' => $categories,
+//      'current_page' => $categories->currentPage(),
+//      'last_page' => $categories->lastPage()
     ]);
   });
 
   //get brands
 Route::get('brands', function(Request $request) {
     $perPage = $request->perPage ?: 7;
-    $brands = Brand::where('deleted_at', '=', null)
-      ->paginate($perPage, ['id', 'name']);
+    $brands = Brand::where('deleted_at', '=', null)->get();
     return response()->json([
-      'data' => $brands->items(),
-      'current_page' => $brands->currentPage(),
-      'last_page' => $brands->lastPage()
+      'data' => $brands,
+//      'current_page' => $brands->currentPage(),
+//      'last_page' => $brands->lastPage()
     ]);
   });
-  
+
