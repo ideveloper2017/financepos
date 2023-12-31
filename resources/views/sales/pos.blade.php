@@ -1038,7 +1038,8 @@
               if(this.product.qty_min > this.product.fix_stock){
                 toastr.error('Minimum sales qty is' + '  ' + '('+this.product.qty_min + ' ' + this.product.unitSale +')' + ' '+ 'But not enough in stock');
               }else{
-                this.details.push(this.product);
+                  this.details.unshift(this.product);
+                // this.details.push(this.product);
                 setTimeout(() => {
                   this.load_product = true;
                 }, 50);
@@ -1315,10 +1316,10 @@
             this.total = 0;
             for (var i = 0; i < this.details.length; i++) {
               var tax = this.details[i].taxe * this.details[i].quantity;
-              this.details[i].subtotal = parseFloat(
-                this.details[i].quantity * this.details[i].Net_price + tax
-              );
-              this.total = parseFloat(this.total + this.details[i].subtotal);
+              this.details[i].subtotal = parseFloat(this.details[i].Net_price);
+              this.total = parseFloat(this.total + parseFloat(
+                  this.details[i].quantity * this.details[i].Net_price + tax
+              ));
             }
 
             if (this.sale.discount_type == 'percent') {
