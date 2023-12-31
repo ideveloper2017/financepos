@@ -3,7 +3,7 @@
   <component name="WebServers">
     <option name="servers">
       <webServer id="9d1a8576-368e-4c13-83e0-33c2846ae04d" name="ftp" url="http://75.119.129.149/">
-        <fileTransfer rootFolder="/financepm.brainsmart.uz" host="75.119.129.149" port="21">
+        <fileTransfer rootFolder="/yutech.brainsmart.uz" host="75.119.129.149" port="21">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>
