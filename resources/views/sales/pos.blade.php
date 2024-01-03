@@ -39,7 +39,6 @@
 </head>
 
 <body class="sidebar-toggled sidebar-fixed-page pos-body">
-
   <!-- Pre Loader Strat  -->
   <div class='loadscreen' id="preloader">
       <div class="loader spinner-border spinner-border-lg">
