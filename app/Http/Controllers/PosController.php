@@ -309,7 +309,7 @@ class PosController extends Controller
 
         $product_warehouse_data = $product_warehouse_data
             ->offset($offSet)
-            ->limit($pageStart)
+            ->limit($perPage)
             ->get();
 
         foreach ($product_warehouse_data as $product_warehouse) {
