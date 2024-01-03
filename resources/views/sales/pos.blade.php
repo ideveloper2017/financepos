@@ -1037,8 +1037,10 @@
               if(this.product.qty_min > this.product.fix_stock){
                 toastr.error('Minimum sales qty is' + '  ' + '('+this.product.qty_min + ' ' + this.product.unitSale +')' + ' '+ 'But not enough in stock');
               }else{
+                  console.log({ ...this.product });
+                  // this.details.unshift({ ...this.product }); // Creating a copy to avoid modifying the original product
                   // this.details.unshift(this.product);
-                this.details.push(this.product);
+               this.details.push(this.product);
                 setTimeout(() => {
                   this.load_product = true;
                 }, 50);
@@ -1386,6 +1388,7 @@
           },
           //----------------------------------- Increment QTY ------------------------------\\
           increment(detail, id) {
+
             for (var i = 0; i < this.details.length; i++) {
               if (this.details[i].detail_id == id) {
                 if (detail.quantity + 1 > detail.current) {
