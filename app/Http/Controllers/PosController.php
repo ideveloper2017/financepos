@@ -268,7 +268,7 @@ class PosController extends Controller
     public function GetProductsByParametre(request $request)
     {
          // How many items do you want to display.
-         $perPage = 8;
+         $perPage = 10  ;
          $pageStart = \Request::get('page', 1);
          // Start displaying items from this number;
          $offSet = ($pageStart * $perPage) - $perPage;

@@ -87,7 +87,7 @@
                     <div class="filter-box">
                         <validation-provider name="brand" rules="required" v-slot="{ valid, errors }">
                             <label>{{ __('translate.All_brands') }} <span class="field_required">*</span></label>
-                            <v-select @input="Selected_Brand" :disabled="details.length > 0"
+                            <v-select @input="Selected_Brand"
                                       placeholder="{{ __('translate.Choose_Brand') }}" v-model="sale.brand_id"
                                       :reduce="(option) => option.value"
                                       :options="brands.map(brands => ({label: brands.name, value: brands.id}))">
@@ -100,7 +100,7 @@
                     <div class="filter-box">
                         <validation-provider name="categories" rules="required" v-slot="{ valid, errors }">
                             <label>{{ __('translate.All_Category') }} <span class="field_required">*</span></label>
-                            <v-select @input="Selected_Category" :disabled="details.length > 0"
+                            <v-select @input="Selected_Category"
                                       placeholder="{{ __('translate.Choose_Category') }}" v-model="sale.category_id"
                                       :reduce="(option) => option.value"
                                       :options="categories.map(categories => ({label: categories.name, value: categories.id}))">
