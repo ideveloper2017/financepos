@@ -68,7 +68,7 @@ $setting = DB::table('settings')->where('deleted_at', '=', null)->first();
                   @{{detail_invoice.imei_number}}</span>
               </td>
               <td class="product_detail_invoice">
-                @{{ detail_invoice.total}}
+                @{{detail_invoice.total_sum}}
               </td>
             </tr>
 
@@ -169,7 +169,7 @@ $setting = DB::table('settings')->where('deleted_at', '=', null)->first();
         methods: {
 
             calculateTotal(detail_invoice) {
-            return this.formatNumber(detail_invoice.quantity,0)*detail_invoice.price;
+            return detail_invoice.quantity*detail_invoice.price;
                 //return detail_invoice.quantity * detail_invoice.price;
             },
 
