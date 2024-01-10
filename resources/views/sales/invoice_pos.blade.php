@@ -68,7 +68,7 @@ $setting = DB::table('settings')->where('deleted_at', '=', null)->first();
                   @{{detail_invoice.imei_number}}</span>
               </td>
               <td class="product_detail_invoice">
-                @{{calculateTotal(detail_invoice)}}
+                @{{detail_invoice.price}}
               </td>
             </tr>
 
