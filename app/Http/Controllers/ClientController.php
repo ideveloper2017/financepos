@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\UserWarehouse;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use App\Imports\ClientImport;
 use App\Models\User;
@@ -58,6 +60,201 @@ class ClientController extends Controller
     }
 
 
+    public function get_sales_datatable(Request $request)
+    {
+        $user_auth = auth()->user();
+        if (!$user_auth->can('sales_view_all') && !$user_auth->can('sales_view_own')){
+            return abort('403', __('You are not authorized'));
+        }else{
+            $helpers = new helpers();
+
+            $param = array(
+                0 => 'like',
+                1 => '=',
+                2 => 'like',
+                3 => '=',
+            );
+            $columns = array(
+                0 => 'Ref',
+                1 => 'client_id',
+                2 => 'payment_statut',
+                3 => 'warehouse_id',
+            );
+
+            $columns_order = array(
+                0 => 'id',
+                2 => 'date',
+                3 => 'Ref',
+            );
+
+            if($user_auth->is_all_warehouses){
+                $array_warehouses_id = Warehouse::where('deleted_at', '=', null)->pluck('id')->toArray();
+            }else{
+                $array_warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
+            }
+
+            if(empty($request->warehouse_id)){
+                $warehouse_id = 0;
+            }else{
+                $warehouse_id = $request->warehouse_id;
+            }
+
+
+
+            $start = $request->input('start');
+            $order = 'sales.'.$columns_order[$request->input('order.0.column')];
+            $dir = $request->input('order.0.dir');
+
+            $end_date_default = Carbon::now()->addYear()->format('Y-m-d');
+            $start_date_default = Carbon::now()->subYear()->format('Y-m-d');
+            $start_date = empty($request->start_date)?$start_date_default:$request->start_date;
+            $end_date = empty($request->end_date)?$end_date_default:$request->end_date;
+
+
+            $sales_data = Sale::where('deleted_at', '=', null)
+                ->whereDate('date', '>=', $start_date)
+                ->whereDate('date', '<=', $end_date)
+
+                ->where(function ($query) use ($request, $warehouse_id, $array_warehouses_id) {
+                    if ($warehouse_id !== 0) {
+                        return $query->where('warehouse_id', $warehouse_id);
+                    }else{
+                        return $query->whereIn('warehouse_id', $array_warehouses_id);
+                    }
+                })
+
+                ->where(function ($query) use ($user_auth) {
+                    if (!$user_auth->can('sales_view_all')) {
+                        return $query->where('user_id', '=', $user_auth->id);
+                    }
+                });
+
+            // Filter
+            $sales_Filtred = $helpers->filter($sales_data, $columns, $param, $request)
+
+                // Search With Multiple Param
+                ->where(function ($query) use ($request) {
+                    return $query->when($request->filled('search'), function ($query) use ($request) {
+                        return $query->where('Ref', 'LIKE', "%{$request->input('search.value')}%")
+                            ->orWhere('payment_statut', 'like', "%{$request->input('search.value')}%")
+                            ->orWhere(function ($query) use ($request) {
+                                return $query->whereHas('client', function ($q) use ($request) {
+                                    $q->where('username', 'LIKE', "%{$request->input('search.value')}%");
+                                });
+                            })
+                            ->orWhere(function ($query) use ($request) {
+                                return $query->whereHas('warehouse', function ($q) use ($request) {
+                                    $q->where('name', 'LIKE', "%{$request->input('search.value')}%");
+                                });
+                            });
+                    });
+                });
+
+            $totalRows = $sales_Filtred->count();
+            $totalFiltered = $totalRows;
+
+            if($request->input('length') != -1)
+                $limit = $request->input('length');
+            else
+                $limit = $totalRows;
+
+            $sales = $sales_Filtred
+                ->with('client', 'warehouse','user')
+                ->offset($start)
+                ->limit($limit)
+                ->orderBy($order, $dir)
+                ->get();
+
+            $data = array();
+
+            foreach ($sales as $sale) {
+
+                $item['id']             = $sale->id;
+                $item['date']           = Carbon::parse($sale->date)->format('d-m-Y H:i');
+                $item['created_by']     = $sale->user->username;
+                $item['warehouse_name'] = $sale->warehouse->name;
+                $item['client_name']    = $sale->client->username;
+                $item['client_email']   = $sale->client->email;
+                $item['city_name']      = $sale->client->city;
+                $item['GrandTotal']     = $this->render_price_with_symbol_placement(number_format($sale->GrandTotal, 2, '.', ','));
+                $item['paid_amount']    = $this->render_price_with_symbol_placement(number_format($sale->paid_amount, 2, '.', ','));
+                $item['due']            = $this->render_price_with_symbol_placement(number_format($sale->GrandTotal - $sale->paid_amount, 2, '.', ','));
+
+                //payment_status
+                if($sale->payment_statut == 'paid'){
+                    $item['payment_status'] = '<span class="badge badge-outline-success">'.trans('translate.Paid').'</span>';
+                }else if($sale->payment_statut == 'partial'){
+                    $item['payment_status'] = '<span class="badge badge-outline-info">'.trans('translate.Partial').'</span>';
+                }else{
+                    $item['payment_status'] = '<span class="badge badge-outline-warning">'.trans('translate.Unpaid').'</span>';
+                }
+
+
+                if (SaleReturn::where('sale_id', $sale->id)->where('deleted_at', '=', null)->exists()) {
+                    $sale_has_return = 'yes';
+                    $item['Ref']    = $sale->Ref.' '.'<i class="text-15 text-danger i-Back"></i>';
+                }else{
+                    $sale_has_return = 'no';
+                    $item['Ref']     = $sale->Ref;
+                }
+
+                $item['action'] = '<div class="dropdown">
+                                    <button class="btn btn-outline-info btn-rounded dropdown-toggle" id="dropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
+                    .trans('translate.Action').
+                    '</button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 34px, 0px);">';
+
+                //check if user has permission "sales_details"
+                if ($user_auth->can('sales_details')){
+                    $item['action'] .=  '<a class="dropdown-item" href="/sale/sales/' .$sale->id.'"> <i class="nav-icon i-Eye font-weight-bold mr-2"></i> ' .trans('translate.SaleDetail').'</a>';
+                }
+
+                if ($user_auth->can('sales_edit') &&  $sale_has_return == 'no'){
+                    $item['action'] .= '<a class="dropdown-item" href="/sale/sales/' .$sale->id. '/edit" ><i class="nav-icon i-Edit font-weight-bold mr-2"></i> ' .trans('translate.EditSale').'</a>';
+                }
+
+                if ($user_auth->can('sale_returns_add') &&  $sale_has_return == 'no'){
+                    $item['action'] .= '<a class="dropdown-item" href="/sales-return/add_returns_sale/' .$sale->id.'" ><i class="nav-icon i-Back font-weight-bold mr-2"></i> ' .trans('translate.Sell_Return').'</a>';
+                }
+
+                //check if user has permission "payment_sales_view"
+                if ($user_auth->can('payment_sales_view')){
+                    $item['action'] .= '<a class="dropdown-item Show_Payments cursor-pointer"  id="' .$sale->id. '" > <i class="nav-icon i-Money-Bag font-weight-bold mr-2"></i> ' .trans('translate.ShowPayment').'</a>';
+                }
+
+                //check if user has permission "payment_sales_add"
+                if ($user_auth->can('payment_sales_add')){
+                    $item['action'] .= '<a class="dropdown-item New_Payment cursor-pointer" payment_status="' .$sale->payment_statut. '"  id="' .$sale->id. '" > <i class="nav-icon i-Add font-weight-bold mr-2"></i> ' .trans('translate.AddPayment').'</a>';
+                }
+
+                $item['action'] .= '<a class="dropdown-item" href="/invoice_pos/' .$sale->id. '" target=_blank> <i class="nav-icon i-File-TXT font-weight-bold mr-2"></i> ' .trans('translate.Invoice_POS').'</a>
+                        <a class="dropdown-item download_pdf cursor-pointer" Ref="' .$sale->Ref. '" id="' .$sale->id. '" ><i class="nav-icon i-File-TXT font-weight-bold mr-2"></i> ' .trans('translate.DownloadPdf').'</a>
+                        <a class="dropdown-item  send_email cursor-pointer" id="' .$sale->id. '" ><i class="nav-icon i-Envelope-2 font-weight-bold mr-2"></i> ' .trans('translate.EmailSale').'</a>
+                        <a class="dropdown-item  send_sms cursor-pointer" id="' .$sale->id. '" ><i class="nav-icon i-Envelope-2 font-weight-bold mr-2"></i> ' .trans('translate.Send_sms').'</a>';
+
+                //check if user has permission "sales_delete"
+                if ($user_auth->can('sales_delete') &&  $sale_has_return == 'no'){
+                    $item['action'] .= '<a class="dropdown-item delete cursor-pointer" id="' .$sale->id. '" > <i class="nav-icon i-Close-Window font-weight-bold mr-2"></i> ' .trans('translate.DeleteSale').'</a>';
+                }
+
+                $item['action'] .= '</div>
+                </div>';
+
+                $data[] = $item;
+
+            }
+
+
+            $json_data = array(
+                "draw"            => intval($request->input('draw')),
+                "recordsTotal"    => intval($totalRows),
+                "recordsFiltered" => intval($totalFiltered),
+                "data"            => $data
+            );
+
+            echo json_encode($json_data);
+        }
+    }
 
     public function get_clients_datatable(Request $request)
     {
@@ -67,9 +264,9 @@ class ClientController extends Controller
             return abort('403', __('You are not authorized'));
         }else{
 
-            $columns_order = array( 
-                0 => 'id', 
-                3 => 'code', 
+            $columns_order = array(
+                0 => 'id',
+                3 => 'code',
                 4 => 'username',
             );
 
@@ -125,7 +322,7 @@ class ClientController extends Controller
                     ->where('deleted_at', '=', null)
                     ->where('client_id', $client->id)
                     ->sum('GrandTotal');
-    
+
                 $total_paid = DB::table('sales')
                     ->where('sales.deleted_at', '=', null)
                     ->where('sales.client_id', $client->id)
@@ -146,12 +343,12 @@ class ClientController extends Controller
                     ->where('sale_returns.deleted_at', '=', null)
                     ->where('sale_returns.client_id', $client->id)
                     ->sum('paid_amount');
-    
+
                 $total_return_Due = $total_amount_return - $total_paid_return;
 
                 $item['return_due'] =  $this->render_price_with_symbol_placement(number_format($total_return_Due, 2, '.', ','));
 
-             
+
                 //status
 
                 if($client->status == 1){
@@ -166,7 +363,7 @@ class ClientController extends Controller
 
                             '</button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 34px, 0px);">';
-                                
+
                                 //check if user has permission "pay_sale_due"
                                  if ($user_auth->can('client_details')){
                                     $item['action'] .=  ' <a class="dropdown-item" href="/people/clients/' .$client->id.'"> <i class="nav-icon  i-Eye font-weight-bold mr-2"></i> ' .trans('translate.Customer_details').'</a>';
@@ -198,12 +395,12 @@ class ClientController extends Controller
 
 
             $json_data = array(
-                "draw"            => intval($request->input('draw')),  
-                "recordsTotal"    => intval($totalRows),  
-                "recordsFiltered" => intval($totalFiltered), 
-                "data"            => $data   
+                "draw"            => intval($request->input('draw')),
+                "recordsTotal"    => intval($totalRows),
+                "recordsFiltered" => intval($totalFiltered),
+                "data"            => $data
             );
-                
+
             echo json_encode($json_data);
         }
     }
@@ -242,13 +439,13 @@ class ClientController extends Controller
             if ($request->hasFile('photo')) {
 
                 $image = $request->file('photo');
-                $filename = time().'.'.$image->extension();  
+                $filename = time().'.'.$image->extension();
                 $image->move(public_path('/images/clients'), $filename);
 
             } else {
                 $filename = 'no_avatar.png';
             }
-            
+
             Client::create([
 
                 'user_id'        => $user_auth->id,
@@ -277,10 +474,10 @@ class ClientController extends Controller
     {
         $user_auth = auth()->user();
 		if ($user_auth->can('client_details')){
-            
+
             $helpers = new helpers();
             $currency = $helpers->Get_Currency();
-          
+
             $client = Client::where('deleted_at', '=', null)
             ->where(function ($query) use ($user_auth) {
                 if (!$user_auth->can('client_view_all')) {
@@ -289,7 +486,7 @@ class ClientController extends Controller
             })->findOrFail($id);
 
             $client_data = [];
-        
+
             $item['full_name'] = $client->username;
             $item['code'] = $client->code;
             $item['phone'] = $client->phone;
@@ -327,6 +524,7 @@ class ClientController extends Controller
 
             $client_data[] = $item;
 
+            $sales=Sale::get();
             return view('clients.details_client', [
                 'client_id' => $id,
                 'client_data' => $client_data[0],
@@ -352,7 +550,7 @@ class ClientController extends Controller
                     return $query->where('user_id', '=', $user_auth->id);
                 }
             })->findOrFail($id);
-            
+
             return view('clients.edit_client', compact('client'));
 
         }
@@ -382,7 +580,7 @@ class ClientController extends Controller
                 if ($request->photo != $currentAvatar) {
 
                     $image = $request->file('photo');
-                    $filename = time().'.'.$image->extension();  
+                    $filename = time().'.'.$image->extension();
                     $image->move(public_path('/images/clients'), $filename);
                     $path = public_path() . '/images/clients';
                     $userPhoto = $path . '/' . $currentAvatar;
@@ -407,7 +605,7 @@ class ClientController extends Controller
                 'status'         => 1,
                 'photo'          => $filename,
             ]);
-          
+
             return response()->json(['success' => true]);
         }
         return abort('403', __('You are not authorized'));
@@ -439,7 +637,7 @@ class ClientController extends Controller
      public function getNumberOrder()
      {
          $last = DB::table('clients')->latest('id')->first();
- 
+
          if ($last) {
              $code = $last->code + 1;
          } else {
@@ -447,7 +645,7 @@ class ClientController extends Controller
          }
          return $code;
      }
- 
+
 
     public function get_client_debt_total($id){
 
@@ -547,12 +745,12 @@ class ClientController extends Controller
                         }
 
             }
-            
+
             return response()->json(['success' => true]);
 
         }
         return abort('403', __('You are not authorized'));
- 
+
      }
 
      public function get_client_debt_return_total($id){
@@ -572,7 +770,7 @@ class ClientController extends Controller
                 ->where('sale_returns.deleted_at', '=', null)
                 ->where('sale_returns.client_id', $id)
                 ->sum('paid_amount');
-            
+
             $return_due =  $item['total_amount_return'] - $item['total_paid_return'];
 
             $payment_methods = PaymentMethod::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','title']);
@@ -606,7 +804,7 @@ class ClientController extends Controller
                     ['payment_statut', '!=', 'paid'],
                     ['client_id', $request->client_id]
                 ])->get();
-    
+
                 $paid_amount_total = $request->montant;
 
                 foreach($client_sell_return_due as $key => $client_sale_return){
@@ -651,14 +849,14 @@ class ClientController extends Controller
                     $paid_amount_total -= $amount;
                 }
             }
-            
+
             return response()->json(['success' => true]);
 
         }
         return abort('403', __('You are not authorized'));
- 
+
      }
- 
+
 
     // generate_random_code_payment
     public function generate_random_code_payment()
@@ -670,7 +868,7 @@ class ClientController extends Controller
         } else {
             return $gen_code;
         }
-        
+
     }
 
     // generate_random_code_payment_return
@@ -683,7 +881,7 @@ class ClientController extends Controller
         } else {
             return $gen_code;
         }
-        
+
     }
 
     public function import_clients_page()
@@ -775,11 +973,11 @@ class ClientController extends Controller
                 //default value
                 $client->status = 1;
                 $client->photo = 'no_avatar.png';
-        
+
                 $client->save();
-               
+
             }
-            
+
             return redirect()->back()->with('success','Clients Imported successfully!');
 
         }

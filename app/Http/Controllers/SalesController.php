@@ -87,6 +87,7 @@ class SalesController extends Controller
 
     public function get_sales_datatable(Request $request)
     {
+        dd($request->id);
         $user_auth = auth()->user();
         if (!$user_auth->can('sales_view_all') && !$user_auth->can('sales_view_own')){
             return abort('403', __('You are not authorized'));
@@ -152,7 +153,7 @@ class SalesController extends Controller
                     if (!$user_auth->can('sales_view_all')) {
                         return $query->where('user_id', '=', $user_auth->id);
                     }
-                });
+                })->where('client_id',$request->id);
 
             // Filter
             $sales_Filtred = $helpers->filter($sales_data, $columns, $param, $request)
