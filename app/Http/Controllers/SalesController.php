@@ -1119,10 +1119,8 @@ class SalesController extends Controller
              $data['quantity'] = $detail->quantity;
              $data['total'] = ($detail->price * $detail->quantity);
              $data['unit_sale'] = $unit?$unit->ShortName:'';
-
              $data['is_imei'] = $detail['product']['is_imei'];
              $data['imei_number'] = $detail->imei_number;
-
              $details[] = $data;
          }
 
