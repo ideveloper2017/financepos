@@ -58,7 +58,7 @@ class SalesController extends Controller
 
     }
 
-    
+
     /**
      * Display a listing of the resource.
      * @return Renderable
@@ -83,7 +83,7 @@ class SalesController extends Controller
         return abort('403', __('You are not authorized'));
     }
 
-    
+
 
     public function get_sales_datatable(Request $request)
     {
@@ -106,10 +106,10 @@ class SalesController extends Controller
                 3 => 'warehouse_id',
             );
 
-            $columns_order = array( 
-                0 => 'id', 
-                2 => 'date', 
-                3 => 'Ref', 
+            $columns_order = array(
+                0 => 'id',
+                2 => 'date',
+                3 => 'Ref',
             );
 
             if($user_auth->is_all_warehouses){
@@ -117,7 +117,7 @@ class SalesController extends Controller
             }else{
                 $array_warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
             }
-                        
+
             if(empty($request->warehouse_id)){
                 $warehouse_id = 0;
             }else{
@@ -139,7 +139,7 @@ class SalesController extends Controller
             $sales_data = Sale::where('deleted_at', '=', null)
                 ->whereDate('date', '>=', $start_date)
                 ->whereDate('date', '<=', $end_date)
-                
+
                 ->where(function ($query) use ($request, $warehouse_id, $array_warehouses_id) {
                     if ($warehouse_id !== 0) {
                         return $query->where('warehouse_id', $warehouse_id);
@@ -147,7 +147,7 @@ class SalesController extends Controller
                         return $query->whereIn('warehouse_id', $array_warehouses_id);
                     }
                 })
-                
+
                 ->where(function ($query) use ($user_auth) {
                     if (!$user_auth->can('sales_view_all')) {
                         return $query->where('user_id', '=', $user_auth->id);
@@ -156,7 +156,7 @@ class SalesController extends Controller
 
             // Filter
             $sales_Filtred = $helpers->filter($sales_data, $columns, $param, $request)
-                
+
             // Search With Multiple Param
             ->where(function ($query) use ($request) {
                 return $query->when($request->filled('search'), function ($query) use ($request) {
@@ -204,7 +204,7 @@ class SalesController extends Controller
                 $item['GrandTotal']     = $this->render_price_with_symbol_placement(number_format($sale->GrandTotal, 2, '.', ','));
                 $item['paid_amount']    = $this->render_price_with_symbol_placement(number_format($sale->paid_amount, 2, '.', ','));
                 $item['due']            = $this->render_price_with_symbol_placement(number_format($sale->GrandTotal - $sale->paid_amount, 2, '.', ','));
-                             
+
                 //payment_status
                 if($sale->payment_statut == 'paid'){
                     $item['payment_status'] = '<span class="badge badge-outline-success">'.trans('translate.Paid').'</span>';
@@ -256,7 +256,7 @@ class SalesController extends Controller
                         <a class="dropdown-item download_pdf cursor-pointer" Ref="' .$sale->Ref. '" id="' .$sale->id. '" ><i class="nav-icon i-File-TXT font-weight-bold mr-2"></i> ' .trans('translate.DownloadPdf').'</a>
                         <a class="dropdown-item  send_email cursor-pointer" id="' .$sale->id. '" ><i class="nav-icon i-Envelope-2 font-weight-bold mr-2"></i> ' .trans('translate.EmailSale').'</a>
                         <a class="dropdown-item  send_sms cursor-pointer" id="' .$sale->id. '" ><i class="nav-icon i-Envelope-2 font-weight-bold mr-2"></i> ' .trans('translate.Send_sms').'</a>';
-                        
+
                         //check if user has permission "sales_delete"
                         if ($user_auth->can('sales_delete') &&  $sale_has_return == 'no'){
                             $item['action'] .= '<a class="dropdown-item delete cursor-pointer" id="' .$sale->id. '" > <i class="nav-icon i-Close-Window font-weight-bold mr-2"></i> ' .trans('translate.DeleteSale').'</a>';
@@ -271,12 +271,12 @@ class SalesController extends Controller
 
 
             $json_data = array(
-                "draw"            => intval($request->input('draw')),  
-                "recordsTotal"    => intval($totalRows),  
-                "recordsFiltered" => intval($totalFiltered), 
-                "data"            => $data   
+                "draw"            => intval($request->input('draw')),
+                "recordsTotal"    => intval($totalRows),
+                "recordsFiltered" => intval($totalFiltered),
+                "data"            => $data
             );
-                
+
             echo json_encode($json_data);
         }
     }
@@ -290,7 +290,7 @@ class SalesController extends Controller
         $user_auth = auth()->user();
 		if ($user_auth->can('sales_add')){
 
-             //get warehouses 
+             //get warehouses
             if($user_auth->is_all_warehouses){
                 $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
             }else{
@@ -319,7 +319,7 @@ class SalesController extends Controller
      */
     public function store(Request $request)
     {
-        
+
         $user_auth = auth()->user();
 		if ($user_auth->can('sales_add')){
 
@@ -334,7 +334,7 @@ class SalesController extends Controller
                 $order->warehouse_id = $request->warehouse_id;
                 $order->tax_rate = $request->tax_rate;
                 $order->TaxNet = $request->TaxNet;
-                
+
                 $order->discount = $request->discount;
                 $order->discount_type = $request->discount_type;
                 $order->discount_percent_total = $request->discount_percent_total;
@@ -547,7 +547,7 @@ class SalesController extends Controller
             $user_auth = auth()->user();
             if ($user_auth->can('sales_edit')){
 
-                //get warehouses 
+                //get warehouses
                 if($user_auth->is_all_warehouses){
                     $array_warehouses_id = Warehouse::where('deleted_at', '=', null)->pluck('id')->toArray();
                     $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
@@ -569,20 +569,20 @@ class SalesController extends Controller
                     })->findOrFail($id);
 
                 $details = array();
-            
+
                 if ($Sale_data->client_id) {
                     if ($client_data = Client::where('id', $Sale_data->client_id)
                         ->where('deleted_at', '=', null)
                         ->first()) {
                         $sale['client_id'] = $Sale_data->client_id;
-                    
+
                     } else {
                         $sale['client_id'] = '';
                     }
                 } else {
                     $sale['client_id'] = '';
                 }
-        
+
                 if ($Sale_data->warehouse_id) {
                     if (Warehouse::where('id', $Sale_data->warehouse_id)
                         ->where('deleted_at', '=', null)
@@ -594,7 +594,7 @@ class SalesController extends Controller
                 } else {
                     $sale['warehouse_id'] = '';
                 }
-        
+
                 $sale['id'] = $Sale_data->id;
                 $sale['date'] = $Sale_data->date;
                 $sale['tax_rate'] = $Sale_data->tax_rate;
@@ -611,23 +611,23 @@ class SalesController extends Controller
                 foreach ($Sale_data['details'] as $detail) {
 
                         $unit = Unit::where('id', $detail->sale_unit_id)->first();
-                            
+
                     if ($detail->product_variant_id) {
                         $item_product = product_warehouse::where('product_id', $detail->product_id)
                             ->where('deleted_at', '=', null)
                             ->where('product_variant_id', $detail->product_variant_id)
                             ->where('warehouse_id', $Sale_data->warehouse_id)
                             ->first();
-        
+
                         $productsVariants = ProductVariant::where('product_id', $detail->product_id)
                             ->where('id', $detail->product_variant_id)->first();
-        
+
                         $item_product ? $data['del'] = 0 : $data['del'] = 1;
                         $data['product_variant_id'] = $detail->product_variant_id;
 
                        $data['code'] = $productsVariants->code;
                        $data['name'] = '['.$productsVariants->name . '] ' . $detail['product']['name'];
-                        
+
                         if ($unit && $unit->operator == '/') {
                             $stock = $item_product ? $item_product->qte * $unit->operator_value : 0;
                         } else if ($unit && $unit->operator == '*') {
@@ -635,12 +635,12 @@ class SalesController extends Controller
                         } else {
                             $stock = 0;
                         }
-        
+
                     } else {
                         $item_product = product_warehouse::where('product_id', $detail->product_id)
                             ->where('deleted_at', '=', null)->where('warehouse_id', $Sale_data->warehouse_id)
                             ->where('product_variant_id', '=', null)->first();
-        
+
                         $item_product ? $data['del'] = 0 : $data['del'] = 1;
                         $data['product_variant_id'] = null;
                         $data['code'] = $detail['product']['code'];
@@ -655,7 +655,7 @@ class SalesController extends Controller
                         }
 
                     }
-                        
+
                         $data['id'] = $detail->id;
                         $data['stock'] = $detail['product']['type'] !='is_service'?$stock:'---';
                         $data['product_type'] = $detail['product']['type'];
@@ -679,7 +679,7 @@ class SalesController extends Controller
 
                         $tax_price = $detail->TaxNet * (($detail->price - $data['DiscountNet']) / 100);
                         $data['Unit_price'] = $detail->price;
-                        
+
                         $data['tax_percent'] = $detail->TaxNet;
                         $data['tax_method'] = $detail->tax_method;
                         $data['discount'] = $detail->discount;
@@ -708,22 +708,22 @@ class SalesController extends Controller
                 foreach ($get_product_warehouse_data as $product_warehouse) {
 
                     if ($product_warehouse->product_variant_id) {
-                
+
                         $item['product_variant_id'] = $product_warehouse->product_variant_id;
                         $item['code'] = $product_warehouse['productVariant']->code;
                         $item['Variant'] = '['.$product_warehouse['productVariant']->name . ']' . $product_warehouse['product']->name;
                         $item['name'] = '['.$product_warehouse['productVariant']->name . ']' . $product_warehouse['product']->name;
                         $item['barcode'] = $product_warehouse['productVariant']->code;
-        
+
                         $product_price = $product_warehouse['productVariant']->price;
-                        
+
                     } else {
                         $item['product_variant_id'] = null;
                         $item['Variant'] = null;
                         $item['code'] = $product_warehouse['product']->code;
                         $item['name'] = $product_warehouse['product']->name;
                         $item['barcode'] = $product_warehouse['product']->code;
-        
+
                         $product_price =  $product_warehouse['product']->price;
                     }
 
@@ -739,26 +739,26 @@ class SalesController extends Controller
                         if($product_warehouse['product']['unitSale']->operator == '/') {
                             $item['qte_sale'] = $product_warehouse->qte * $product_warehouse['product']['unitSale']->operator_value;
                             $price = $product_price / $product_warehouse['product']['unitSale']->operator_value;
-        
+
                         }else{
                             $item['qte_sale'] = $product_warehouse->qte / $product_warehouse['product']['unitSale']->operator_value;
                             $price = $product_price * $product_warehouse['product']['unitSale']->operator_value;
                         }
-        
+
                     }else{
                         $item['qte_sale'] = $product_warehouse->qte;
                         $price = $product_price;
                     }
-        
+
                     if($product_warehouse['product']['unitPurchase']) {
-        
+
                         if($product_warehouse['product']['unitPurchase']->operator == '/') {
                             $item['qte_purchase'] = round($product_warehouse->qte * $product_warehouse['product']['unitPurchase']->operator_value, 5);
-        
+
                         }else{
                             $item['qte_purchase'] = round($product_warehouse->qte / $product_warehouse['product']['unitPurchase']->operator_value, 5);
                         }
-        
+
                     }else{
                         $item['qte_purchase'] = $product_warehouse->qte;
                     }
@@ -783,10 +783,10 @@ class SalesController extends Controller
 
                     $products_array[] = $item;
                 }
-                
-            
+
+
                 $clients = client::where('deleted_at', '=', null)->get(['id', 'username']);
-        
+
                 return view('sales.edit_sale',
                     [
                         'details' => $details,
@@ -801,7 +801,7 @@ class SalesController extends Controller
             return abort('403', __('You are not authorized'));
 
         }
-  
+
     }
 
     /**
@@ -837,9 +837,9 @@ class SalesController extends Controller
                     $old_products_id = [];
                     foreach ($old_sale_details as $key => $value) {
                         $old_products_id[] = $value->id;
-                        
+
                         $old_unit = Unit::where('id', $value['sale_unit_id'])->first();
-                    
+
 
                             if ($value['product_variant_id']) {
                                 $product_warehouse = product_warehouse::where('deleted_at', '=', null)
@@ -877,12 +877,12 @@ class SalesController extends Controller
                                 $SaleDetail = SaleDetail::findOrFail($value->id);
                                 $SaleDetail->delete();
                             }
-                        
+
                     }
 
                     // Update Data with New request
                     foreach ($new_sale_details as $prd => $prod_detail) {
-                        
+
                             $unit_prod = Unit::where('id', $prod_detail['sale_unit_id'])->first();
 
 
@@ -950,7 +950,7 @@ class SalesController extends Controller
                         $payment_statut = 'unpaid';
                     }
 
-                
+
                     $current_Sale->update([
                         'date' => $request['date'],
                         'client_id' => $request['client_id'],
@@ -997,7 +997,7 @@ class SalesController extends Controller
                     $old_sale_details = SaleDetail::where('sale_id', $id)->get();
 
                     foreach ($old_sale_details as $key => $value) {
-                        
+
                         $old_unit = Unit::where('id', $value['sale_unit_id'])->first();
 
                         if ($value['product_variant_id']) {
@@ -1030,7 +1030,7 @@ class SalesController extends Controller
                                 $product_warehouse->save();
                             }
                         }
-                            
+
                     }
 
                     $current_Sale->details()->delete();
@@ -1042,22 +1042,22 @@ class SalesController extends Controller
                      $payments = PaymentSale::where('sale_id', $id)->get();
 
                      foreach ($payments as $payment) {
- 
+
                          $account = Account::find($payment->account_id);
- 
+
                          if ($account) {
                              $account->update([
                                  'initial_balance' => $account->initial_balance - $payment->montant,
                              ]);
                          }
-                         
+
                      }
 
                      PaymentSale::where('sale_id', $id)->update([
                         'deleted_at' => Carbon::now(),
                     ]);
 
-                    
+
                 }, 10);
 
                 return response()->json(['success' => true],200);
@@ -1073,7 +1073,7 @@ class SalesController extends Controller
     {
         $details = array();
          $user_auth = auth()->user();
-         
+
          $sale = Sale::with('details.product.unitSale')
              ->where('deleted_at', '=', null)
              ->where(function ($query) use ($user_auth) {
@@ -1081,7 +1081,7 @@ class SalesController extends Controller
                     return $query->where('user_id', '=', $user_auth->id);
                 }
             })->findOrFail($id);
- 
+
          $item['id']                     = $sale->id;
          $item['Ref']                    = $sale->Ref;
          $item['date']                   = Carbon::parse($sale->date)->format('d-m-Y H:i');
@@ -1098,84 +1098,84 @@ class SalesController extends Controller
          $item['client_name']            = $sale['client']->username;
          $item['GrandTotal']             = $this->render_price_with_symbol_placement(number_format($sale->GrandTotal, 2, '.', ','));
          $item['paid_amount']            = $this->render_price_with_symbol_placement(number_format($sale->paid_amount, 2, '.', ','));
- 
+
          foreach ($sale['details'] as $detail) {
- 
+
             $unit = Unit::where('id', $detail->sale_unit_id)->first();
              if ($detail->product_variant_id) {
- 
+
                  $productsVariants = ProductVariant::where('product_id', $detail->product_id)
                      ->where('id', $detail->product_variant_id)->first();
- 
+
                      $data['code'] = $productsVariants->name . '-' . $detail['product']['code'];
                      $data['name'] = $productsVariants->name . '-' . $detail['product']['name'];
-                     
+
                  } else {
                      $data['code'] = $detail['product']['code'];
                      $data['name'] = $detail['product']['name'];
                  }
-                 
+
              $data['price'] = $detail->price;
              $data['quantity'] = $detail->quantity;
-             $data['total'] = $detail->total;
+             $data['total'] = $detail->price*$detail->quantity;
              $data['unit_sale'] = $unit?$unit->ShortName:'';
- 
+
              $data['is_imei'] = $detail['product']['is_imei'];
              $data['imei_number'] = $detail->imei_number;
- 
+
              $details[] = $data;
          }
- 
+
          $payments = PaymentSale::with('sale')
              ->where('sale_id', $id)
              ->orderBy('id', 'DESC')
              ->get();
- 
+
          $settings = Setting::where('deleted_at', '=', null)->first();
- 
+
          return response()->json([
              'payments' => $payments,
              'setting' => $settings,
              'sale' => $item,
              'details' => $details,
          ]);
- 
+
      }
- 
+
      //------------- GET PAYMENTS SALE -----------\\
- 
+
      public function Payments_Sale(Request $request, $id)
      {
- 
+
          $Sale = Sale::findOrFail($id);
          $payments = PaymentSale::with('sale')
             ->where('sale_id', $id)
             ->orderBy('id', 'DESC')->get();
- 
+
          $due = $Sale->GrandTotal - $Sale->paid_amount;
 
          $payment_methods = PaymentMethod::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','title']);
          $accounts = Account::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','account_name']);
-         
- 
+
+
          return response()->json([
-            'payments' => $payments, 
+            'payments' => $payments,
             'due' => $due,
             'payment_methods' => $payment_methods,
             'accounts' => $accounts,
         ]);
- 
+
      }
 
-     
- 
+
+
      //------------- Reference Number Order SALE -----------\\
- 
+
      public function getNumberOrder()
      {
- 
+
          $last = DB::table('sales')->latest('id')->first();
- 
+
          if ($last) {
              $item = $last->Ref;
              $nwMsg = explode("_", $item);
@@ -1186,19 +1186,19 @@ class SalesController extends Controller
          }
          return $code;
      }
- 
+
      //------------- SALE PDF -----------\\
- 
+
      public function Sale_PDF(Request $request, $id)
      {
- 
+
          $details = array();
          $user_auth = auth()->user();
 
          $sale_data = Sale::with('details.product.unitSale')
              ->where('deleted_at', '=', null)
              ->findOrFail($id);
- 
+
          $sale['client_name']            = $sale_data['client']->username;
          $sale['client_phone']           = $sale_data['client']->phone;
          $sale['client_adr']             = $sale_data['client']->address;
@@ -1223,36 +1223,36 @@ class SalesController extends Controller
 
          $detail_id = 0;
          foreach ($sale_data['details'] as $detail) {
- 
+
             $unit = Unit::where('id', $detail->sale_unit_id)->first();
              if ($detail->product_variant_id) {
- 
+
                  $productsVariants = ProductVariant::where('product_id', $detail->product_id)
                      ->where('id', $detail->product_variant_id)->first();
- 
+
                 $data['code'] = $productsVariants->code;
                 $data['name'] = '['.$productsVariants->name . '] ' . $detail['product']['name'];
              } else {
                  $data['code'] = $detail['product']['code'];
                  $data['name'] = $detail['product']['name'];
              }
- 
+
                  $data['detail_id'] = $detail_id += 1;
                  $data['quantity'] = number_format($detail->quantity, 2, '.', '');
                  $data['total'] = number_format($detail->total, 2, '.', ' ');
                  $data['unitSale'] = $unit?$unit->ShortName:'';
                  $data['price'] = number_format($detail->price, 2, '.', ' ');
- 
+
              if ($detail->discount_method == '2') {
                  $data['DiscountNet'] = number_format($detail->discount, 2, '.', '');
              } else {
                  $data['DiscountNet'] = number_format($detail->price * $detail->discount / 100, 2, '.', '');
              }
- 
+
              $tax_price = $detail->TaxNet * (($detail->price - $data['DiscountNet']) / 100);
              $data['Unit_price'] = number_format($detail->price, 2, '.', '');
              $data['discount'] = number_format($detail->discount, 2, '.', '');
- 
+
              if ($detail->tax_method == '1') {
                  $data['Net_price'] = $detail->price - $data['DiscountNet'];
                  $data['taxe'] = number_format($tax_price, 2, '.', '');
@@ -1260,10 +1260,10 @@ class SalesController extends Controller
                  $data['Net_price'] = ($detail->price - $data['DiscountNet']) / (($detail->TaxNet / 100) + 1);
                  $data['taxe'] = number_format($detail->price - $data['Net_price'] - $data['DiscountNet'], 2, '.', '');
              }
- 
+
              $data['is_imei'] = $detail['product']['is_imei'];
              $data['imei_number'] = $detail->imei_number;
- 
+
              $details[] = $data;
          }
          $settings = Setting::where('deleted_at', '=', null)->first();
@@ -1287,9 +1287,9 @@ class SalesController extends Controller
         return $pdf->download('Sale.pdf');
         //----------
 
- 
+
      }
-     
+
      //------------- Send sale on Email -----------\\
 
     public function Send_Email(Request $request)
@@ -1302,10 +1302,10 @@ class SalesController extends Controller
 
          //settings
          $settings = Setting::where('deleted_at', '=', null)->first();
-     
+
          //the custom msg of sale
          $emailMessage  = EmailMessage::where('name', 'sale')->first();
- 
+
          if($emailMessage){
              $message_body = $emailMessage->body;
              $message_subject = $emailMessage->subject;
@@ -1313,28 +1313,28 @@ class SalesController extends Controller
              $message_body = '';
              $message_subject = '';
          }
- 
+
          //Tags
          $random_number = Str::random(10);
          $invoice_url = url('/sell_url/' . $request->id.'?'.$random_number);
          $invoice_number = $sale->Ref;
- 
+
          $total_amount = $this->render_price_with_symbol_placement(number_format($sale->GrandTotal, 2, '.', ','));
          $paid_amount  = $this->render_price_with_symbol_placement(number_format($sale->paid_amount, 2, '.', ','));
          $due_amount   = $this->render_price_with_symbol_placement(number_format($sale->GrandTotal - $sale->paid_amount, 2, '.', ','));
- 
+
          $contact_name = $sale['client']->username;
          $business_name = $settings->CompanyName;
- 
+
          //receiver email
          $receiver_email = $sale['client']->email;
- 
+
          //replace the text with tags
          $message_body = str_replace('{contact_name}', $contact_name, $message_body);
          $message_body = str_replace('{business_name}', $business_name, $message_body);
          $message_body = str_replace('{invoice_url}', $invoice_url, $message_body);
          $message_body = str_replace('{invoice_number}', $invoice_number, $message_body);
- 
+
          $message_body = str_replace('{total_amount}', $total_amount, $message_body);
          $message_body = str_replace('{paid_amount}', $paid_amount, $message_body);
          $message_body = str_replace('{due_amount}', $due_amount, $message_body);
@@ -1343,7 +1343,7 @@ class SalesController extends Controller
         $email['body'] = $message_body;
         $email['company_name'] = $business_name;
 
-        $this->Set_config_mail(); 
+        $this->Set_config_mail();
 
         $mail = Mail::to($receiver_email)->send(new CustomEmail($email));
 
@@ -1386,10 +1386,10 @@ class SalesController extends Controller
 
         $helpers = new helpers();
         $currency = $helpers->Get_Currency();
-        
+
         //settings
         $settings = Setting::where('deleted_at', '=', null)->first();
-    
+
         //the custom msg of sale
         $smsMessage  = SMSMessage::where('name', 'sale')->first();
 
@@ -1427,16 +1427,16 @@ class SalesController extends Controller
         //twilio
         if($settings->default_sms_gateway == "twilio"){
             try {
-    
+
                 $account_sid = env("TWILIO_SID");
                 $auth_token = env("TWILIO_TOKEN");
                 $twilio_number = env("TWILIO_FROM");
-    
+
                 $client = new Client_Twilio($account_sid, $auth_token);
                 $client->messages->create($receiverNumber, [
-                    'from' => $twilio_number, 
+                    'from' => $twilio_number,
                     'body' => $message_text]);
-        
+
             } catch (Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 500);
             }
@@ -1447,13 +1447,13 @@ class SalesController extends Controller
                 $basic  = new \Nexmo\Client\Credentials\Basic(env("NEXMO_KEY"), env("NEXMO_SECRET"));
                 $client = new \Nexmo\Client($basic);
                 $nexmo_from = env("NEXMO_FROM");
-        
+
                 $message = $client->message()->send([
                     'to' => $receiverNumber,
                     'from' => $nexmo_from,
                     'text' => $message_text
                 ]);
-                        
+
             } catch (Exception $e) {
                 return response()->json(['message' => $e->getMessage()], 500);
             }
@@ -1469,30 +1469,30 @@ class SalesController extends Controller
                 ->setHost($BASE_URL)
                 ->setApiKeyPrefix('Authorization', 'App')
                 ->setApiKey('Authorization', $API_KEY);
-            
+
             $client = new Client_guzzle();
-            
+
             $sendSmsApi = new SendSMSApi($client, $configuration);
             $destination = (new SmsDestination())->setTo($receiverNumber);
             $message = (new SmsTextualMessage())
                 ->setFrom($SENDER)
                 ->setText($message_text)
                 ->setDestinations([$destination]);
-                
+
             $request = (new SmsAdvancedTextualRequest())->setMessages([$message]);
-            
+
             try {
                 $smsResponse = $sendSmsApi->sendSmsMessage($request);
                 echo ("Response body: " . $smsResponse);
             } catch (Throwable $apiException) {
                 echo("HTTP Code: " . $apiException->getCode() . "\n");
             }
-            
+
         }
 
         return response()->json(['success' => true]);
 
-        
+
     }
 
 
