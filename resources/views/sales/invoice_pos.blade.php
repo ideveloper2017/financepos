@@ -61,14 +61,14 @@ $setting = DB::table('settings')->where('deleted_at', '=', null)->first();
         <table class="detail_invoice">
           <tbody>
             <tr v-for="detail_invoice in details">
-              <td colspan="3">
+              <td colspan="4">
                 @{{detail_invoice.name}}&nbsp &nbsp<span>@{{formatNumber(detail_invoice.quantity,0)}} x @{{detail_invoice.price}}</span>
                 <br v-show="detail_invoice.is_imei && detail_invoice.imei_number !==null">
                 <span v-show="detail_invoice.is_imei && detail_invoice.imei_number !==null ">IMEI_SN :
                   @{{detail_invoice.imei_number}}</span>
               </td>
               <td class="product_detail_invoice">
-                  @{{formatNumber(detail_invoice.quantity,0)*detail_invoice.price}}
+                  @{{formatNumber(detail_invoice.quantity,0)}} @{{detail_invoice.price}}
               </td>
             </tr>
 
