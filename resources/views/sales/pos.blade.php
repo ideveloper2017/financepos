@@ -40,6 +40,9 @@
         .card {
             border: 1px solid #4e97fd;
         }
+        .card-list-products .card-items {
+            max-height: 600px;
+        }
     </style>
 </head>
 
@@ -712,6 +715,7 @@
             products: [],
             products_pos: [],
             details: [],
+            productlist:[],
             detail: {},
             sale: {
                 sale: "",
@@ -1033,21 +1037,21 @@
                 this.audio.play();
                 if (this.details.some(detail => detail.code === code)) {
                     this.increment_qty_scanner(code);
-
                 } else {
                     if (this.details.length > 0) {
-                        this.order_detail_id();
+                      this.order_detail_id();
                     } else if (this.details.length === 0) {
                         this.product.detail_id = 1;
                     }
                     if(this.product.qty_min > this.product.fix_stock){
                         toastr.error('Minimum sales qty is' + '  ' + '('+this.product.qty_min + ' ' + this.product.unitSale +')' + ' '+ 'But not enough in stock');
                     }else{
-                       this.details.push(this.product);
-                        setTimeout(() => {
+                        // this.details.unshift({ ...this.product }); // Creating a copy to avoid modifying the original product
+                        // this.details.unshift(this.product);
+                        this.details.push(this.product);
+                        // setTimeout(() => {
                             this.load_product = true;
-                        }, 50);
-
+                        // }, 50);
                     }
                 }
             },
@@ -1056,8 +1060,8 @@
             order_detail_id() {
                 this.product.detail_id = 0;
                 var len = this.details.length;
-                this.product.detail_id = this.details[len-1].detail_id + 1;
-                console.log(len);
+                this.product.detail_id = this.details[len-1].detail_id+1;
+                console.log(this.details);
             },
 
             //---------------------- Get_sales_units ------------------------------\\
