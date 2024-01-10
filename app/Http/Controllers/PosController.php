@@ -563,7 +563,7 @@ class PosController extends Controller
                     }
 
                 $data['price'] = $this->render_price_with_symbol_placement(number_format($detail->price, 2, '.', ','));
-                $data['total'] = $this->render_price_with_symbol_placement(number_format($detail->total, 2, '.', ','));
+                $data['total'] = $this->render_price_with_symbol_placement(number_format( $detail->quantity*$detail->price, 2, '.', ','));
                 $data['quantity'] = $detail->quantity;
                 $data['unit_sale'] = $unit?$unit->ShortName:'';
 

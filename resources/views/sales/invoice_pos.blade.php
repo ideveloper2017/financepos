@@ -68,7 +68,7 @@ $setting = DB::table('settings')->where('deleted_at', '=', null)->first();
                   @{{detail_invoice.imei_number}}</span>
               </td>
               <td class="product_detail_invoice">
-                @{{detail_invoice.price}}
+                  @{{formatNumber(detail_invoice.quantity,0)}}
               </td>
             </tr>
 
@@ -120,7 +120,7 @@ $setting = DB::table('settings')->where('deleted_at', '=', null)->first();
             <tr>
               <th class="text-left" colspan="1">{{ __('translate.Paid_by') }}:</th>
               <th class="text-right" colspan="2">{{ __('translate.Amount') }}:</th>
-              </th>
+
             </tr>
           </thead>
 
