@@ -169,7 +169,17 @@ class ClientController extends Controller
             $data = array();
 
             foreach ($sales as $sale) {
+                $total_return_Due = 0;
+                $total_amount_return = DB::table('sale_returns')
+                    ->where('deleted_at', '=', null)
+                    ->where('sale_id', $sale->id)
+                    ->sum('GrandTotal');
 
+                $total_paid_return = DB::table('sale_returns')
+                    ->where('sale_returns.deleted_at', '=', null)
+                    ->where('sale_returns.sale_id', $sale->id)
+                    ->sum('paid_amount');
+                $total_return_Due=$total_amount_return-$total_paid_return;
                 $item['id']             = $sale->id;
                 $item['date']           = Carbon::parse($sale->date)->format('d-m-Y H:i');
                 $item['created_by']     = $sale->user->username;
@@ -177,9 +187,9 @@ class ClientController extends Controller
                 $item['client_name']    = $sale->client->username;
                 $item['client_email']   = $sale->client->email;
                 $item['city_name']      = $sale->client->city;
-                $item['GrandTotal']     = $this->render_price_with_symbol_placement(number_format($sale->GrandTotal, 2, '.', ','));
-                $item['paid_amount']    = $this->render_price_with_symbol_placement(number_format($sale->paid_amount, 2, '.', ','));
-                $item['due']            = $this->render_price_with_symbol_placement(number_format($sale->GrandTotal - $sale->paid_amount, 2, '.', ','));
+                $item['GrandTotal']     = $this->render_price_with_symbol_placement(number_format($sale->GrandTotal-$total_amount_return, 2, '.', ','));
+                $item['paid_amount']    = $this->render_price_with_symbol_placement(number_format($sale->paid_amount - $total_paid_return, 2, '.', ','));
+                $item['due']            = $this->render_price_with_symbol_placement(number_format(($sale->GrandTotal - $sale->paid_amount)-$total_return_Due, 2, '.', ','));
 
                 //payment_status
                 if($sale->payment_statut == 'paid'){
@@ -318,6 +328,7 @@ class ClientController extends Controller
 
                 //sell_due
                 $sell_due = 0;
+                $total_return_Due = 0;
 
                 $total_amount = DB::table('sales')
                     ->where('deleted_at', '=', null)
@@ -329,29 +340,21 @@ class ClientController extends Controller
                     ->where('sales.client_id', $client->id)
                     ->sum('paid_amount');
 
-                $sell_due = $total_amount - $total_paid;
-                $item['sell_due'] =  $this->render_price_with_symbol_placement(number_format($sell_due, 2, '.', ','));
-
-                //return due
-                $total_return_Due = 0;
-
                 $total_amount_return = DB::table('sale_returns')
-                ->where('deleted_at', '=', null)
-                ->where('client_id', $client->id)
-                ->sum('GrandTotal');
+                    ->where('deleted_at', '=', null)
+                    ->where('client_id', $client->id)
+                    ->sum('GrandTotal');
 
                 $total_paid_return = DB::table('sale_returns')
                     ->where('sale_returns.deleted_at', '=', null)
                     ->where('sale_returns.client_id', $client->id)
                     ->sum('paid_amount');
-
                 $total_return_Due = $total_amount_return - $total_paid_return;
-
+                $sell_due = $total_amount - $total_paid;
+                $item['sell_due'] =  $this->render_price_with_symbol_placement(number_format($sell_due-$total_return_Due, 2, '.', ','));
+                //return due
                 $item['return_due'] =  $this->render_price_with_symbol_placement(number_format($total_return_Due, 2, '.', ','));
-
-
                 //status
-
                 if($client->status == 1){
                     $item['status'] = '<span class="badge badge-success">Client Actif</span>';
                 }else{
@@ -665,13 +668,14 @@ class ClientController extends Controller
             }
 
             $total_debt = 0;
+            $total_return_Due=0;
 
             $item['total_sales'] = DB::table('sales')
             ->where('deleted_at', '=', null)
             ->where('client_id', $id)
             ->count();
 
-            $total_amount = DB::table('sales')
+             $total_amount = DB::table('sales')
             ->where('deleted_at', '=', null)
             ->where('client_id', $id)
             ->sum('GrandTotal');
@@ -681,11 +685,22 @@ class ClientController extends Controller
             ->where('sales.client_id', $id)
             ->sum('paid_amount');
 
+            $total_amount_return = DB::table('sale_returns')
+                ->where('deleted_at', '=', null)
+                ->where('client_id', $client->id)
+                ->sum('GrandTotal');
+
+            $total_paid_return = DB::table('sale_returns')
+                ->where('sale_returns.deleted_at', '=', null)
+                ->where('sale_returns.client_id', $client->id)
+                ->sum('paid_amount');
+            $total_return_Due = $total_amount_return - $total_paid_return;
+
             $total_debt =  $total_amount - $total_paid;
 
-            $item['total_amount'] = $this->render_price_with_symbol_placement(number_format($total_amount, 2, '.', ','));
-            $item['total_paid']   = $this->render_price_with_symbol_placement(number_format($total_paid, 2, '.', ','));
-            $item['total_debt']   = $this->render_price_with_symbol_placement(number_format($total_debt, 2, '.', ','));
+            $item['total_amount'] = $this->render_price_with_symbol_placement(number_format($total_amount-$total_amount_return, 2, '.', ','));
+            $item['total_paid']   = $this->render_price_with_symbol_placement(number_format($total_paid-$total_paid, 2, '.', ','));
+            $item['total_debt']   = $this->render_price_with_symbol_placement(number_format($total_debt-$total_return_Due, 2, '.', ','));
 
             $client_data[] = $item;
 
