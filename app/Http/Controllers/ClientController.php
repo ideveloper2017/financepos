@@ -25,6 +25,7 @@ use App\utils\helpers;
 use DB;
 use Auth;
 
+
 class ClientController extends Controller
 {
 
@@ -405,6 +406,170 @@ class ClientController extends Controller
         }
     }
 
+    public function get_sale_return_datatable(Request $request)
+    {
+        $user_auth = auth()->user();
+        if ($user_auth->can('sale_returns_view_all') || $user_auth->can('sale_returns_view_own')){
+
+
+            if($user_auth->is_all_warehouses){
+                $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
+                $array_warehouses_id = Warehouse::where('deleted_at', '=', null)->pluck('id')->toArray();
+            }else{
+                $array_warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
+                $warehouses = Warehouse::where('deleted_at', '=', null)->whereIn('id', $array_warehouses_id)->get(['id', 'name']);
+            }
+
+            if(empty($request->warehouse_id)){
+                $warehouse_id = 0;
+            }else{
+                $warehouse_id = $request->warehouse_id;
+            }
+
+
+            if ($request->ajax()) {
+                $helpers = new helpers();
+                // Filter fields With Params to retrieve
+                $param = array(
+                    0 => 'like',
+                    1 => '=',
+                    2 => 'like',
+                    3 => '=',
+                    4 => '=',
+                );
+                $columns = array(
+                    0 => 'Ref',
+                    1 => 'client_id',
+                    2 => 'payment_statut',
+                    3 => 'warehouse_id',
+                    4 => 'sale_id',
+                );
+
+                $end_date_default = Carbon::now()->addYear()->format('Y-m-d');
+                $start_date_default = Carbon::now()->subYear()->format('Y-m-d');
+                $start_date = empty($request->start_date)?$start_date_default:$request->start_date;
+                $end_date = empty($request->end_date)?$end_date_default:$request->end_date;
+
+                $data = SaleReturn::where('deleted_at', '=', null)
+                    ->where(function ($query) use ($request, $warehouse_id, $array_warehouses_id) {
+                        if ($warehouse_id !== 0) {
+                            return $query->where('warehouse_id', $warehouse_id);
+                        }else{
+                            return $query->whereIn('warehouse_id', $array_warehouses_id);
+                        }
+                    })
+
+                    ->whereDate('date', '>=', $start_date)
+                    ->whereDate('date', '<=', $end_date)
+                    ->where(function ($query) use ($user_auth) {
+                        if (!$user_auth->can('sale_returns_view_all')) {
+                            return $query->where('user_id', '=', $user_auth->id);
+                        }
+                    })->where('client_id','=',$request->client_id)
+                    ->with('sale','facture', 'client', 'warehouse')
+                    ->orderBy('id', 'desc');
+
+                //Multiple Filter
+                $return_Filtred = $helpers->filter($data, $columns, $param, $request)->get();
+
+                return Datatables::of($return_Filtred)
+                    ->setRowId(function($return_Filtred)
+                    {
+                        return $return_Filtred->id;
+                    })
+
+                    ->addColumn('date', function($row){
+                        return Carbon::parse($row->date)->format('d-m-Y H:i');
+                    })
+
+                    ->addColumn('sale_id', function($row){
+                        return $row->sale->id;
+                    })
+
+                    ->addColumn('sale_ref', function($row){
+                        return $row->sale->Ref;
+                    })
+
+                    ->addColumn('Ref', function($row){
+                        return $row->Ref;
+                    })
+
+                    ->addColumn('warehouse_name', function($row){
+                        return $row->warehouse->name;
+                    })
+                    ->addColumn('client_name', function($row){
+                        return $row->client->username;
+                    })
+
+                    ->addColumn('GrandTotal', function($row){
+                        return $this->render_price_with_symbol_placement(number_format($row->GrandTotal, 2, '.', ','));
+                    })
+                    ->addColumn('paid_amount', function($row){
+                        return $this->render_price_with_symbol_placement(number_format($row->paid_amount, 2, '.', ','));
+                    })
+                    ->addColumn('due', function($row){
+                        return $this->render_price_with_symbol_placement(number_format($row->GrandTotal - $row->paid_amount, 2, '.', ','));
+                    })
+
+                    ->addColumn('payment_status', function($row){
+                        if($row->payment_statut == 'paid'){
+                            $span = '<span class="badge badge-success">'.trans('translate.Paid').'</span>';
+                        }else if($row->payment_statut == 'partial'){
+                            $span = '<span class="badge badge-info">'.trans('translate.Partial').'</span>';
+                        }else{
+                            $span = '<span class="badge badge-warning">'.trans('translate.Unpaid').'</span>';
+                        }
+                        return $span;
+                    })
+
+                    ->addColumn('action', function($row) use ($user_auth) {
+
+                        $btn =  '<div class="dropdown">
+                                <button class="btn btn-outline-info btn-rounded dropdown-toggle" id="dropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
+                            .trans('translate.Action').
+                            '</button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 34px, 0px);">
+                                    <a class="dropdown-item" href="/sales-return/returns_sale/' .$row->id.'"> <i class="nav-icon i-Eye font-weight-bold mr-2"></i> '.trans('translate.Details_Return').'</a>';
+
+                        //check if user has permission "sale_returns_edit"
+                        if ($user_auth->can('sale_returns_edit')){
+                            $btn .=  '<a class="dropdown-item" href="/sales-return/edit_returns_sale/' .$row->id. '/'.$row->sale_id.'" ><i class="nav-icon i-Edit font-weight-bold mr-2"></i> '.trans('translate.Edit_Return').'</a>';
+                        }
+
+                        //check if user has permission "payment_sell_returns_view"
+                        if ($user_auth->can('payment_sell_returns_view')){
+                            $btn .= '<a class="dropdown-item Show_Payments cursor-pointer"  id="' .$row->id. '" > <i class="nav-icon i-Money-Bag font-weight-bold mr-2"></i> ' .trans('translate.ShowPayment').'</a>';
+                        }
+
+                        //check if user has permission "payment_sell_returns_add"
+                        if ($user_auth->can('payment_sell_returns_add')){
+                            $btn .= '<a class="dropdown-item New_Payment cursor-pointer" payment_status="' .$row->payment_statut. '"  id="' .$row->id. '" > <i class="nav-icon i-Add font-weight-bold mr-2"></i> ' .trans('translate.AddPayment').'</a>';
+                        }
+
+
+                        $btn .=    '<a class="dropdown-item download_pdf cursor-pointer" Ref="' .$row->Ref. '" id="' .$row->id. '" ><i class="nav-icon i-File-TXT font-weight-bold mr-2"></i> ' .trans('translate.DownloadPdf').'</a>';
+
+                        //check if user has permission "sale_returns_delete"
+                        if ($user_auth->can('sale_returns_delete')){
+                            $btn .=    '<a class="dropdown-item delete cursor-pointer" id="' .$row->id. '" > <i class="nav-icon i-Close-Window font-weight-bold mr-2"></i> ' .trans('translate.Delete_Return').'</a>';
+                        }
+                        $btn .='</div>
+                            </div>';
+
+
+                        return $btn;
+                    })
+                    ->rawColumns(['action','payment_status'])
+                    ->make(true);
+            }
+
+            $clients = client::where('deleted_at', '=', null)->get(['id', 'username']);
+            $sales = Sale::where('deleted_at', '=', null)->get(['id', 'Ref']);
+
+            return view('sales_return.list_sale_return',compact('clients','sales','warehouses'));
+
+        }
+    }
     /**
      * Show the form for creating a new resource.
      *

@@ -238,6 +238,7 @@ if ($installed === true) {
                  Route::resource('people/clients', 'ClientController');
                  Route::post('get_clients_datatable', 'ClientController@get_clients_datatable')->name('clients_datatable');
                  Route::post('get_clients_sales_datatable', 'ClientController@get_sales_datatable')->name('client_sales_datatable');
+                 Route::get('get_sale_return_datatable', 'ClientController@get_sale_return_datatable')->name('client_sales_return_datatable');
                  Route::get('get_client_plafond/{id}', 'ClientController@get_client_plafond');
                  Route::get('get_client_debt_total/{id}', 'ClientController@get_client_debt_total');
                  Route::get('get_client_debt_return_total/{id}', 'ClientController@get_client_debt_return_total');

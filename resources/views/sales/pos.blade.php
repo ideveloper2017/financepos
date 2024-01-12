@@ -269,11 +269,7 @@
                                                     @else
                                                         <h6 class="fw-semibold m-0 font_16">@{{detail.subtotal.toFixed(2)}} {{$currency}}</h6>
                                                     @endif
-
-
-
                                                 </div>
-
                                             </div>
                                             <div class="d-flex align-items-center">
                           <span class="increment-decrement btn btn-light rounded-circle"
@@ -281,7 +277,6 @@
                                                 <input class="fw-semibold cart-qty m-0 px-2"
                                                        @keyup="Verified_Qty(detail,detail.detail_id)" :min="0.00" :max="detail.stock"
                                                        v-model.number="detail.quantity">
-
                                                 <span class="increment-decrement btn btn-light rounded-circle"
                                                       @click="increment(detail ,detail.detail_id)">+</span>
                                             </div>
@@ -289,15 +284,12 @@
                                     </div>
 
                                     <div class="cart-summery">
-
                                         {{--                                  <div>--}}
                                         {{--                                      <div class="summery-item mb-2 row">--}}
                                         {{--                                          <span class="title mr-2 col-lg-12 col-sm-12">{{ __('translate.Shipping') }}</span>--}}
-
                                         {{--                                          <div class="col-lg-8 col-sm-12">--}}
                                         {{--                                              <validation-provider name="Shipping" :rules="{ regex: /^\d*\.?\d*$/}"--}}
                                         {{--                                                                   v-slot="validationContext">--}}
-
                                         {{--                                                  <div class="input-group text-right">--}}
                                         {{--                                                      <input :state="getValidationState(validationContext)"--}}
                                         {{--                                                             aria-describedby="Shipping-feedback" v-model.number="sale.shipping"--}}
@@ -308,7 +300,6 @@
                                         {{--                                              </validation-provider>--}}
                                         {{--                                          </div>--}}
                                         {{--                                      </div>--}}
-
                                         {{--                                      <div class="summery-item mb-2 row">--}}
                                         {{--                                          <span class="title mr-2 col-lg-12 col-sm-12">{{ __('translate.Order_Tax') }}</span>--}}
                                         {{--                                          <div class="col-lg-8 col-sm-12">--}}
@@ -318,14 +309,12 @@
                                         {{--                                                      <input :state="getValidationState(validationContext)"--}}
                                         {{--                                                             aria-describedby="OrderTax-feedback" v-model.number="sale.tax_rate"--}}
                                         {{--                                                             @keyup="keyup_OrderTax()" type="text" class="no-focus form-control pos-tax">--}}
-
                                         {{--                                                      <span class="input-group-text cursor-pointer" id="basic-addon3">%</span>--}}
                                         {{--                                                  </div>--}}
                                         {{--                                                  <span class="error">@{{ validationContext.errors[0] }}</span>--}}
                                         {{--                                              </validation-provider>--}}
                                         {{--                                          </div>--}}
                                         {{--                                      </div>--}}
-
                                         {{--                                      <div class="summery-item mb-3 row">--}}
                                         {{--                                          <span class="title mr-2 col-lg-12 col-sm-12">{{ __('translate.Discount') }}</span>--}}
                                         {{--                                          <div class="col-lg-8 col-sm-12 summery-item-discount">--}}
@@ -916,7 +905,8 @@
             },
 
             pay_now(){
-                this.payment.montant = this.formatNumber(this.GrandTotal, 2);
+                // this.payment.montant = this.formatNumber(this.GrandTotal, 2);
+                this.payment.montant = ''
                 $('#add_payment_sale').modal('show');
                 NProgress.done();
             },
@@ -1264,12 +1254,17 @@
                                 toastr.success('{{ __('translate.Created_in_successfully') }}');
                                 window.open("/invoice_pos/" + response.data.id, "_blank");
                                 window.location.reload();
+                            } else {
+                                NProgress.done();
+                                this.paymentProcessing = false;
+                                toastr.error(response.data.message);
                             }
                         })
                         .catch(error => {
                             NProgress.done();
                             this.paymentProcessing = false;
-                            toastr.error('{{ __('translate.There_was_something_wronge') }}');
+                            toastr.error(error.message);
+                            {{--toastr.error('{{ __('translate.There_was_something_wronge') }}');--}}
                         });
                 }
             },
