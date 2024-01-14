@@ -64,7 +64,6 @@ $setting = DB::table('settings')->where('deleted_at', '=', null)->first();
                 <th>№</th>
                 <th>{{__('translate.ProductName') }}</th>
                 <th style="text-align:center;">Кол</th>
-                <th>X</th>
                 <th style="text-align:center;">{{__('translate.Price') }}</th>
                 <th>{{__('translate.Total') }}</th>
             </tr>
@@ -75,24 +74,22 @@ $setting = DB::table('settings')->where('deleted_at', '=', null)->first();
                   @{{index+=1}}
               </td>
                 <td><strong>@{{detail_invoice.name}}</strong></td>
-                <td style="text-align:right;">
-                    <span><strong>@{{formatNumber(detail_invoice.quantity,0)}}</strong></span>
+                <td style="text-align:center;" colspan="2">
+                    <span><strong>@{{formatNumber(detail_invoice.quantity,0)}} X </strong></span>
+                    @{{detail_invoice.price}}=
 {{--                    <br v-show="detail_invoice.is_imei && detail_invoice.imei_number !==null">--}}
 {{--                    <span v-show="detail_invoice.is_imei && detail_invoice.imei_number !==null ">--}}
 {{--                        IMEI_SN :--}}
 {{--                  @{{detail_invoice.imei_number}}</span>--}}
                 </td>
-                <td  style="text-align:center;">X</td>
-                <td style="text-align:left;">
-                    @{{detail_invoice.price}}=
-                </td>
+
               <td class="product_detail_invoice">
                   @{{detail_invoice.total}}
               </td>
             </tr>
 
             <tr class="mt-10" v-show="pos_settings.show_discount">
-              <td colspan="5" class="total">{{ __('translate.Tax') }}</td>
+              <td colspan="4" class="total">{{ __('translate.Tax') }}</td>
               <td class="total text-right">
                 @{{sale.taxe}} (@{{formatNumber(sale.tax_rate,2)}} %)
               </td>
@@ -100,7 +97,7 @@ $setting = DB::table('settings')->where('deleted_at', '=', null)->first();
 
             {{-- Discount --}}
             <tr class="mt-10" v-show="pos_settings.show_discount">
-              <td colspan="5" class="total">{{ __('translate.Discount') }}</td>
+              <td colspan="4" class="total">{{ __('translate.Discount') }}</td>
               <td class="total text-right">
                 <span>@{{sale.discount}}</span>
               </td>
@@ -108,28 +105,34 @@ $setting = DB::table('settings')->where('deleted_at', '=', null)->first();
             </tr>
 
             <tr class="mt-10" v-show="pos_settings.show_discount">
-              <td colspan="5" class="total">{{ __('translate.Shipping') }}</td>
+              <td colspan="4" class="total">{{ __('translate.Shipping') }}</td>
               <td class="total text-right">
                 @{{sale.shipping}}</td>
             </tr>
 
             <tr class="mt-10">
-              <td colspan="5" class="total">{{ __('translate.Total') }}</td>
+              <td colspan="4" class="total">{{ __('translate.Total') }}</td>
               <td  class="total text-right">
                 @{{sale.GrandTotal}}</td>
             </tr>
 
             <tr v-show="isPaid">
-              <td colspan="5" class="total">{{ __('translate.Paid') }}</td>
+              <td colspan="4" class="total">{{ __('translate.Paid') }}</td>
               <td class="total text-right">
                  @{{sale.paid_amount}}</td>
             </tr>
 
             <tr v-show="isPaidLessThanTotal">
-              <td colspan="5" class="total">{{ __('translate.Due') }}</td>
+              <td colspan="4" class="total">{{ __('translate.Due') }}</td>
               <td class="total text-right">
-                @{{sale.client_due}}
+                @{{sale.current_total_amount}}
               </td>
+            </tr>
+            <tr v-show="isPaidLessThanTotal">
+                <td colspan="4" class="total">{{  __('translate.Total debt')  }}</td>
+                <td class="total text-right">
+                    @{{sale.client_due}}
+                </td>
             </tr>
           </tbody>
         </table>
@@ -138,6 +141,7 @@ $setting = DB::table('settings')->where('deleted_at', '=', null)->first();
           <thead>
             <tr>
               <th class="text-left" colspan="1">{{ __('translate.Paid_by') }}:</th>
+              <th class="text-right" colspan="2">{{ __('translate.Amount') }}:</th>
               <th class="text-right" colspan="2">{{ __('translate.Amount') }}:</th>
 
             </tr>
@@ -151,13 +155,13 @@ $setting = DB::table('settings')->where('deleted_at', '=', null)->first();
             </tr>
           </tbody>
         </table>
-         <div id="legalcopy" class="ms-2"  v-show="pos_settings.show_note">
-          <p class="legal">
-            <strong></strong>
-          </p>
-        </div>
 
         <div id="legalcopy" class="ms-2"  v-show="pos_settings.show_note">
+          <p class="legal">
+            <strong>@{{ sale.note}}</strong>
+          </p>
+        </div>
+          <div id="legalcopy" class="ms-2"  v-show="pos_settings.show_note">
           <p class="legal">
             <strong>@{{ pos_settings.note_customer }}</strong>
           </p>

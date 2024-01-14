@@ -518,31 +518,35 @@ class PosController extends Controller
             $sale = Sale::with('details.product.unitSale')
                 ->where('deleted_at', '=', null)
                 ->findOrFail($id);
-                
-          $current_total_amount = DB::table('sales')
-                ->where('deleted_at', '=', null)
+
+          $current_total_amount = Sale::where('deleted_at', '=', null)
                 ->where('client_id', $sale->client_id)
-                ->whereDate('date','=',$sale->date)
+                 ->where('id',$id)
                 ->sum('GrandTotal');
 
+            $current_total_paid = Sale::where('deleted_at', '=', null)
+                ->where('client_id', $sale->client_id)
+                ->where('id',$id)
+                ->sum('paid_amount');
 
-            $total_amount = DB::table('sales')
-                ->where('deleted_at', '=', null)
+            $current_sell_due=($current_total_amount-$current_total_paid);
+
+            $total_amount = Sale::where('deleted_at', '=', null)
                 ->where('client_id', $sale->client_id)
                 ->sum('GrandTotal');
 
-            $total_paid= DB::table('sales')
-                ->where('sales.deleted_at', '=', null)
+            $total_paid= Sale::where('sales.deleted_at', '=', null)
                 ->where('sales.client_id', $sale->client_id)
                 ->sum('paid_amount');
 
-            $sell_due =  ($total_amount-$current_total_amount) - $total_paid;
+            $sell_due =  ($total_amount) - $total_paid;
 
             $dueclient=$sell_due;
 
             $item['id']                     = $sale->id;
             $item['Ref']                    = $sale->Ref;
             $item['date']                   = Carbon::parse($sale->date)->format('d-m-Y H:i');
+            $item['note']                   = $sale->notes;
 
             if($sale->discount_type == 'fixed'){
                 $item['discount']           = $this->render_price_with_symbol_placement(number_format($sale->discount, 2, '.', ','));
@@ -559,6 +563,7 @@ class PosController extends Controller
             $item['paid_amount']            = $this->render_price_with_symbol_placement(number_format($sale->paid_amount, 2, '.', ','));
             $item['due']                    = $this->render_price_with_symbol_placement(number_format($sale->GrandTotal - $sale->paid_amount, 2, '.', ','));
             $item['client_due']             = $this->render_price_with_symbol_placement(number_format($sell_due, 2, '.', ','));
+            $item['current_total_amount']             = $this->render_price_with_symbol_placement(number_format($current_sell_due, 2, '.', ','));
             foreach ($sale['details'] as $detail) {
 
                 $unit = Unit::where('id', $detail->sale_unit_id)->first();
@@ -594,6 +599,7 @@ class PosController extends Controller
             $payments_details = [];
             foreach ($payments as $payment) {
 
+                $payment_data['note'] = $payment->note;
                 $payment_data['Reglement'] = $payment->payment_method->title;
                 $payment_data['montant']   = $this->render_price_with_symbol_placement(number_format($payment->montant, 2, '.', ','));
 
