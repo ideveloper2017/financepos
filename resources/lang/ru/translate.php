@@ -10,7 +10,7 @@ return [
     'This_Month' => 'Этот месяц',
     'Last_Month' => 'Прошлый месяц',
     'Ref_of_cheque' => 'Ссылка на чек',
-    'Size'=>'Размер',
+
     'Top_Clients' => 'Лучшие клиенты',
     'Monthly_purchase' => 'Ежемесячная покупка',
     'monthly_sales' => 'Ежемесячные продажи',
@@ -143,7 +143,7 @@ return [
     'Choose_Warehouse' => 'Выбрать склад',
     'Scan_Search_Product_by_Code_Name' => 'Сканировать / Искать товар по коду или названию',
     'Code_Product' => 'Код товара',
-    'Product_Name' => 'Название товара/Протектор',
+    'Product_Name' => 'Название товара',
     'Current_Stock' => 'Текущий запас',
     'Qty' => 'Кол-во',
     'type' => 'Тип',
@@ -176,7 +176,6 @@ return [
     'Name_of_category' => 'Название категории',
     'Enter_name_category' => 'Введите название категории',
     'Enter_Name_Product' => 'Введите название товара',
-    'Enter_Size' => 'Введите размер',
     'Scan_your_barcode_and_select_the_correct_symbology_below' => 'Сканируйте ваш штрих-код и выберите правильный символ ниже',
     'Category' => 'Категория',
     'Choose_Category' => 'Выберите категорию',
@@ -1165,7 +1164,7 @@ return [
 'Total_adjustments' => 'Всего корректировок',
 'User_report' => 'Отчет пользователя',
 'Current_stock' => 'Текущий запас',
-'product_name' => 'Название продукта/Протектор',
+'product_name' => 'Название продукта',
 'Total_Customers_Due' => 'Общая задолженность клиентов',
 'Total_Suppliers_Due' => 'Общая задолженность поставщикам',
 'Some_warehouses' => 'Некоторые склады',
@@ -1843,7 +1842,7 @@ return [
 'Product_has_expiry_date' => 'Товар имеет срок годности',
 'Expiry_date' => 'Дата истечения срока годности',
 'report_Expiry_date' => 'Отчет по истечению срока годности',
-'Product_Name' => 'Название товара/Протектор',
+'Product_Name' => 'Название товара',
 'Purchase_Ref' => 'Ссылка на покупку',
 'Purchase_Date' => 'Дата покупки',
 'Expired_At' => 'Истекает',
@@ -2035,6 +2034,7 @@ return [
 'Sell Return payments' => 'Платежи по возвратам продаж',
 'Purchase Return payments' => 'Платежи по возвратам покупок',
 'Quantity Alerts Report' => 'Отчет о предупреждениях количества',
+
 'Twilio API' => 'Twilio API',
 'Twilio SID' => 'Twilio SID',
 'Twilio TOKEN' => 'Twilio TOKEN',
@@ -2060,6 +2060,7 @@ return [
 'Laragon' => 'Laragon',
 'Xampp' => 'Xampp',
 'Live Server (Hosting)' => 'Живой сервер (хостинг)',
+
 'English' => 'Английский',
 'Frensh' => 'Французский',
 'Arabic' => 'Арабский',
@@ -2128,4 +2129,31 @@ return [
 'Total Purchases' => 'Общие покупки',
 'Search' => 'Поиск...',
 'EXPORT' => 'ЭКСПОРТ',
+
+
+
+
+
+
+
+   
+   
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ];

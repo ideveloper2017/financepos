@@ -157,7 +157,6 @@ class ProductsController extends Controller
                     if($product->type == 'is_single'){
 
                       $item['type']  = 'Single';
-                      $item['model']  = $product->model;
                       $item['name'] = $product->name;
                       $item['code'] = $product->code;
                       $item['cost']  = $this->render_price_with_symbol_placement(number_format($product->cost, 2, '.', ','), $symbol_placement);
@@ -315,7 +314,6 @@ class ProductsController extends Controller
                     }),
                 ],
                 'name'         => 'required',
-                'model'        => 'required',
                 'category_id'  => 'required',
                 'type'         => 'required',
                 'tax_method'   => 'required',
@@ -467,7 +465,6 @@ class ProductsController extends Controller
                     //-- Field Required
                     $Product->type         = $request['type'];
                     $Product->name         = $request['name'];
-                    $Product->model        = $request['model'];
                     $Product->code         = $request['code'];
                     $Product->Type_barcode = 'CODE128';
                     $Product->category_id  = $request['category_id'];
@@ -774,7 +771,6 @@ class ProductsController extends Controller
 
             $item['id'] = $Product->id;
             $item['type'] = $Product->type;
-            $item['model'] = $Product->model    ;
             $item['code'] = $Product->code;
             $item['Type_barcode'] = $Product->Type_barcode;
             $item['qty_min'] = $Product->qty_min;
@@ -888,7 +884,6 @@ class ProductsController extends Controller
                     }),
                 ],
                 'name'        => 'required',
-                'model'       =>'required',
                 'category_id' => 'required',
                 'tax_method'  => 'required',
                 'type'        => 'required',
@@ -1041,7 +1036,6 @@ class ProductsController extends Controller
 
                     //-- Update Product
                     $Product->type        = $request['type'];
-                    $Product->model       = $request['model'];
                     $Product->name        = $request['name'];
                     $Product->code        = $request['code'];
                     $Product->category_id = $request['category_id'];
@@ -1194,6 +1188,7 @@ class ProductsController extends Controller
                                                 'product_variant_id' => $ProductVariantDT->id,
                                                 'manage_stock'       => $manage_stock,
                                             ];
+
                                         }
                                         product_warehouse::insert($product_warehouse);
                                     }
@@ -1201,11 +1196,13 @@ class ProductsController extends Controller
                                     ProductVariant::where('id', $variant['id'])->update($ProductVariantUP);
                                 }
                             }
+
                         } else {
                             $ProducttWarehouse = product_warehouse::where('product_id', $id)
                                 ->update([
                                     'deleted_at' => Carbon::now(),
                                 ]);
+
                             foreach ($request['variants'] as $variant) {
                                 $product_warehouse_DT = [];
                                 $ProductVarDT = new ProductVariant;

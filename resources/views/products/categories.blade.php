@@ -10,6 +10,8 @@
 </div>
 
 <div class="separator-breadcrumb border-top"></div>
+
+
 <div class="row" id="section_Category_list">
   <div class="col-md-12">
     <div class="card">
@@ -18,6 +20,7 @@
           <a class="new_category btn btn-outline-primary btn-md m-1"><i class="i-Add me-2 font-weight-bold"></i>
             {{ __('translate.Create') }}</a>
         </div>
+
         <div class="table-responsive">
           <table id="category_table" class="display table">
             <thead>
@@ -30,8 +33,10 @@
             </thead>
             <tbody>
             </tbody>
+
           </table>
         </div>
+
       </div>
     </div>
   </div>
@@ -46,10 +51,10 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-
+  
           <form @submit.prevent="editmode?Update_Category():Create_Category()" enctype="multipart/form-data">
             <div class="row">
-
+  
               <div class="form-group col-md-12">
                 <label for="code">{{ __('translate.Code_of_category') }}<span class="field_required">*</span></label>
                 <input type="text" v-model="category.code" class="form-control" name="code" id="code"
@@ -58,7 +63,7 @@
                   @{{ errors.code[0] }}
                 </span>
               </div>
-
+  
               <div class="form-group col-md-12">
                 <label for="name">{{ __('translate.Name_of_category') }}<span class="field_required">*</span></label>
                 <input type="text" v-model="category.name" class="form-control" name="name" id="name"
@@ -67,10 +72,10 @@
                   @{{ errors.name[0] }}
                 </span>
               </div>
-
+  
             </div>
             <div class="row mt-3">
-
+  
               <div class="col-md-6">
                 <button type="submit" class="btn btn-primary" :disabled="SubmitProcessing">
                   <span v-if="SubmitProcessing" class="spinner-border spinner-border-sm" role="status"
@@ -78,12 +83,12 @@
                 </button>
               </div>
             </div>
-
-
+  
+  
           </form>
-
+  
         </div>
-
+  
       </div>
     </div>
   </div>
@@ -125,9 +130,9 @@
                     {data: 'code', name: 'code'},
                     {data: 'name', name: 'name'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
-
+                
                 ],
-
+            
                 lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
                 dom: "<'row'<'col-sm-12 col-md-7'lB><'col-sm-12 col-md-5 p-0'f>>rtip",
                 oLanguage: {
@@ -136,7 +141,7 @@
                     sInfoEmpty: "{{ __('datatable.sInfoEmpty') }}",
                     sInfoFiltered: "{{ __('datatable.sInfoFiltered') }}",
                     sInfoThousands: "{{ __('datatable.sInfoThousands') }}",
-                    sLengthMenu: "_MENU_",
+                    sLengthMenu: "_MENU_", 
                     sLoadingRecords: "{{ __('datatable.sLoadingRecords') }}",
                     sProcessing: "{{ __('datatable.sProcessing') }}",
                     sSearch: "",
@@ -229,7 +234,7 @@
             app.reset_Form();
             var id = $(this).attr('id');
             app.Get_Data_Edit(id);
-
+           
             setTimeout(() => {
                 NProgress.done()
                 $('#modal_Category').modal('show');
@@ -251,17 +256,17 @@
             editmode: false,
             SubmitProcessing:false,
             errors:[],
-            categories: [],
+            categories: [], 
             category: {
                 id: "",
                 name: "",
                 code: ""
             }
         },
-
+       
         methods: {
 
-
+            
 
             //------------------------------ Modal  (create category) -------------------------------\\
             New_category() {
@@ -279,7 +284,7 @@
                 };
               this.errors = {};
             },
-
+          
             //---------------------- Get_Data_Edit  ------------------------------\\
             Get_Data_Edit(id) {
                 axios
@@ -288,7 +293,7 @@
                     this.category   = response.data.category;
                 })
                 .catch(error => {
-
+                    
                 });
             },
 
@@ -369,7 +374,7 @@
                     });
                 },
 
-
+         
 
         },
         //-----------------------------Autoload function-------------------

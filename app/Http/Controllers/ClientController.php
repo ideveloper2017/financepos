@@ -694,13 +694,14 @@ class ClientController extends Controller
                 ->where('sale_returns.deleted_at', '=', null)
                 ->where('sale_returns.client_id', $client->id)
                 ->sum('paid_amount');
+                
             $total_return_Due = $total_amount_return - $total_paid_return;
 
             $total_debt =  $total_amount - $total_paid;
 
-            $item['total_amount'] = $this->render_price_with_symbol_placement(number_format($total_amount-$total_amount_return, 2, '.', ','));
-            $item['total_paid']   = $this->render_price_with_symbol_placement(number_format($total_paid-$total_paid, 2, '.', ','));
-            $item['total_debt']   = $this->render_price_with_symbol_placement(number_format($total_debt-$total_return_Due, 2, '.', ','));
+            $item['total_amount'] = $this->render_price_with_symbol_placement(number_format($total_amount, 2, '.', ','));
+            $item['total_paid']   = $this->render_price_with_symbol_placement(number_format($total_paid, 2, '.', ','));
+            $item['total_debt']   = $this->render_price_with_symbol_placement(number_format($total_debt, 2, '.', ','));
 
             $client_data[] = $item;
 

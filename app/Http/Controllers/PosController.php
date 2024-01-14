@@ -518,11 +518,17 @@ class PosController extends Controller
             $sale = Sale::with('details.product.unitSale')
                 ->where('deleted_at', '=', null)
                 ->findOrFail($id);
+                
+          $current_total_amount = DB::table('sales')
+                ->where('deleted_at', '=', null)
+                ->where('client_id', $sale->client_id)
+                ->whereDate('date','=',$sale->date)
+                ->sum('GrandTotal');
+
 
             $total_amount = DB::table('sales')
                 ->where('deleted_at', '=', null)
                 ->where('client_id', $sale->client_id)
-
                 ->sum('GrandTotal');
 
             $total_paid= DB::table('sales')
@@ -530,7 +536,7 @@ class PosController extends Controller
                 ->where('sales.client_id', $sale->client_id)
                 ->sum('paid_amount');
 
-            $sell_due =  $total_amount - $total_paid;
+            $sell_due =  ($total_amount-$current_total_amount) - $total_paid;
 
             $dueclient=$sell_due;
 
