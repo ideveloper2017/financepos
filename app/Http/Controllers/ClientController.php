@@ -694,7 +694,7 @@ class ClientController extends Controller
                 ->where('sale_returns.deleted_at', '=', null)
                 ->where('sale_returns.client_id', $client->id)
                 ->sum('paid_amount');
-                
+
             $total_return_Due = $total_amount_return - $total_paid_return;
 
             $total_debt =  $total_amount - $total_paid;
@@ -861,6 +861,38 @@ class ClientController extends Controller
         return abort('403', __('You are not authorized'));
     }
 
+    public function get_client_payments($id){
+
+//        $user_auth = auth()->user();
+//        if ($user_auth->can('pay_sale_due')){
+//
+//            $client = Client::findOrFail($id);
+//            $sell_due = 0;
+//
+//            $item['total_amount'] = Sale::where('deleted_at', '=', null)
+//                ->where('client_id', $id)
+//                ->sum('GrandTotal');
+//
+//            $item['total_paid'] = DB::table('sales')
+//                ->where('sales.deleted_at', '=', null)
+//                ->where('sales.client_id', $id)
+//                ->sum('paid_amount');
+//
+//            $sell_due =  $item['total_amount'] - $item['total_paid'];
+//            $payment_methods = PaymentMethod::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','title']);
+//            $accounts = Account::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','account_name']);
+//
+//            return response()->json([
+//                'sell_due' => $sell_due,
+//                'payment_methods' => $payment_methods,
+//                'accounts' => $accounts,
+//            ]);
+//
+//        }
+//        return abort('403', __('You are not authorized'));
+        $payments=PaymentSale::query()->get();
+
+    }
      //------------- clients_pay_due -------------\\
 
      public function clients_pay_due(Request $request)
