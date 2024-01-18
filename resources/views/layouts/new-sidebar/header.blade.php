@@ -7,7 +7,7 @@
 
         <div class="dropdown layouts_add_new">
             <button
-                class="btn btn-light d-none d-lg-flex align-items-center px-3 py-2 fw-semibold" 
+                class="btn btn-light d-none d-lg-flex align-items-center px-3 py-2 fw-semibold"
                 type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false"
             >
                 @include('components.icons.plus', ['class'=>'me-2 width_14'])
@@ -41,19 +41,19 @@
                     @can('quotations_add')
                         <li><a class="dropdown-item" href="/quotation/quotations/create"> <i class="i-Checkout-Basket text-20 me-2 "></i> {{ __('translate.Add_Quotation') }}</a></li>
                     @endcan
-                  
+
                 </ul>
-                
+
         </div>
         <a
-                class="btn btn-light d-none d-lg-flex align-items-center px-3 py-2 fw-semibold" 
+                class="btn btn-light d-none d-lg-flex align-items-center px-3 py-2 fw-semibold"
                 href="/people/clients"
             >
                 @include('components.icons.plus', ['class'=>'me-2 width_14'])
                 <span>{{ __('translate.Client_List') }}</span>
             </a>
              <a
-                class="btn btn-light d-none d-lg-flex align-items-center px-3 py-2 fw-semibold" 
+                class="btn btn-light d-none d-lg-flex align-items-center px-3 py-2 fw-semibold"
                 href="/sale/sales"
             >
                 @include('components.icons.plus', ['class'=>'me-2 width_14'])
@@ -72,7 +72,7 @@
         </button>
 
         <div class="button_language dropdown p-2 ms-2">
-            
+
             <i class="i-Globe"
                 type="button"
                 data-bs-toggle="dropdown" aria-expanded="false"
@@ -80,25 +80,26 @@
 
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="{{route('language.switch','en')}}"> <img class="flag-icon" src="{{asset('assets/flags/gb.svg')}}">  English</a></li>
-                <li><a class="dropdown-item" href="{{route('language.switch','fr')}}"><img class="flag-icon" src="{{asset('assets/flags/fr.svg')}}">  Frensh</a></li>
-                <li><a class="dropdown-item" href="{{route('language.switch','ar')}}"><img class="flag-icon" src="{{asset('assets/flags/sa.svg')}}">  Arabic</a></li>
-                <li><a class="dropdown-item" href="{{route('language.switch','tur')}}"><img class="flag-icon" src="{{asset('assets/flags/tr.svg')}}">  Turkish</a></li>
-                <li><a class="dropdown-item" href="{{route('language.switch','hn')}}"><img class="flag-icon" src="{{asset('assets/flags/in.svg')}}"> Hindi</a></li>
-                <li><a class="dropdown-item" href="{{route('language.switch','gr')}}"><img class="flag-icon" src="{{asset('assets/flags/de.svg')}}"> Germany</a></li>
-                <li><a class="dropdown-item" href="{{route('language.switch','es')}}"><img class="flag-icon" src="{{asset('assets/flags/es.svg')}}"> Spanish</a></li>
-                <li><a class="dropdown-item" href="{{route('language.switch','it')}}"><img class="flag-icon" src="{{asset('assets/flags/it.svg')}}"> Italien</a></li>
-                <li><a class="dropdown-item" href="{{route('language.switch','Ind')}}"><img class="flag-icon" src="{{asset('assets/flags/id.svg')}}"> Indonesian</a></li>
+{{--                <li><a class="dropdown-item" href="{{route('language.switch','fr')}}"><img class="flag-icon" src="{{asset('assets/flags/fr.svg')}}">  Frensh</a></li>--}}
+{{--                <li><a class="dropdown-item" href="{{route('language.switch','ar')}}"><img class="flag-icon" src="{{asset('assets/flags/sa.svg')}}">  Arabic</a></li>--}}
+{{--                <li><a class="dropdown-item" href="{{route('language.switch','tur')}}"><img class="flag-icon" src="{{asset('assets/flags/tr.svg')}}">  Turkish</a></li>--}}
+{{--                <li><a class="dropdown-item" href="{{route('language.switch','hn')}}"><img class="flag-icon" src="{{asset('assets/flags/in.svg')}}"> Hindi</a></li>--}}
+{{--                <li><a class="dropdown-item" href="{{route('language.switch','gr')}}"><img class="flag-icon" src="{{asset('assets/flags/de.svg')}}"> Germany</a></li>--}}
+{{--                <li><a class="dropdown-item" href="{{route('language.switch','es')}}"><img class="flag-icon" src="{{asset('assets/flags/es.svg')}}"> Spanish</a></li>--}}
+{{--                <li><a class="dropdown-item" href="{{route('language.switch','it')}}"><img class="flag-icon" src="{{asset('assets/flags/it.svg')}}"> Italien</a></li>--}}
+{{--                <li><a class="dropdown-item" href="{{route('language.switch','Ind')}}"><img class="flag-icon" src="{{asset('assets/flags/id.svg')}}"> Indonesian</a></li>--}}
                 <li><a class="dropdown-item" href="{{route('language.switch','ru')}}"><img class="flag-icon" src="{{asset('assets/flags/ru.svg')}}">  Russian</a></li>
-                <li><a class="dropdown-item" href="{{route('language.switch','ba')}}"><img class="flag-icon" src="{{asset('assets/flags/bd.svg')}}">  Bangla</a></li>
+                <li><a class="dropdown-item" href="{{route('language.switch','uz')}}"><img class="flag-icon" src="{{asset('assets/flags/uz.svg')}}">  Uzbek</a></li>
+{{--                <li><a class="dropdown-item" href="{{route('language.switch','ba')}}"><img class="flag-icon" src="{{asset('assets/flags/bd.svg')}}">  Bangla</a></li>--}}
 
             </ul>
         </div>
-        
+
         <div class="dropdown button_settings">
-            <img 
-                alt="" 
-                width="42" 
-                height="42" 
+            <img
+                alt=""
+                width="42"
+                height="42"
                 type="button"
                 data-bs-toggle="dropdown" aria-expanded="false"
                 class="rounded-circle dropdown-toggle"
