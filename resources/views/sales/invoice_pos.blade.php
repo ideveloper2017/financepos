@@ -71,7 +71,7 @@ $setting = DB::table('settings')->where('deleted_at', '=', null)->first();
           <tbody>
             <tr v-for="(detail_invoice, index) in details" >
                 <td class="product_detail_invoice">
-                  @{{index+=1}}
+                  @{{index+=1}}.
               </td>
                 <td><strong>@{{detail_invoice.name}}</strong></td>
                 <td style="text-align:center;" colspan="2">

@@ -155,7 +155,7 @@
                       'searchable': false,
                   },
                   {
-                      'targets': [1,2,5,6,7,8,9,10],
+                      'targets': [1,5,6,7,8,9,10],
                       "orderable": false,
                   },
                 ],

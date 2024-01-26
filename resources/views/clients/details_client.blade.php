@@ -74,7 +74,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-6 col-sm-6">
+  <div class="col-lg-3 col-md-6 col-sm-6">
                     <div class="card card-icon-big mb-4">
                         <div class="card-body text-center">
                             <i class="i-Money-Bag"></i>
@@ -86,6 +86,19 @@
                         </div>
                     </div>
                 </div>
+
+{{--                <div class="col-lg-3 col-md-6 col-sm-6">--}}
+{{--                    <div class="card card-icon-big mb-4">--}}
+{{--                        <div class="card-body text-center">--}}
+{{--                            <i class="i-Money-Bag"></i>--}}
+{{--                            <div class="content">--}}
+{{--                                <p class="text-muted mt-2 mb-2">{{ __('translate.Total paid') }}</p>--}}
+{{--                                <p class="text-primary text-24 line-height-1 m-0" id="return_sales_data">--}}
+{{--                                    {{$client_data['retun_total_debt']}}</p>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
 
                 <div class="col-lg-3 col-md-6 col-sm-6">
                     <div class="card card-icon-big mb-4">

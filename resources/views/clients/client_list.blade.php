@@ -31,14 +31,16 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th class="not_show">{{ __('translate.Action') }}</th>
                                 <th>{{ __('translate.Image') }}</th>
                                 <th>{{ __('translate.Code') }}</th>
                                 <th>{{ __('translate.FullName') }}</th>
                                 <th>{{ __('translate.Phone') }}</th>
                                 <th>{{ __('translate.Total_Sale_Due') }}</th>
                                 <th>{{ __('translate.Total_Sell_Return_Due') }}</th>
+                                <th>{{ __('translate.TotalPaid') }}</th>
+                                <th>{{ __('translate.Total debt') }}</th>
                                 <th>{{ __('translate.Status') }}</th>
+                                <th class="not_show">{{ __('translate.Action') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -62,19 +64,19 @@
                     <div class="modal-body">
                         <form @submit.prevent="Submit_Payment()">
                             <div class="row">
-    
+
                                 <!-- Date -->
                                 <div class="col-md-6">
                                     <validation-provider name="date" rules="required" v-slot="validationContext">
                                     <div class="form-group">
                                         <label for="picker3">{{ __('translate.Date') }}</label>
-                                        
-                                        <input type="text" 
-                                        :state="getValidationState(validationContext)" 
-                                        aria-describedby="date-feedback" 
-                                        class="form-control" 
-                                        placeholder="{{ __('translate.Select_Date') }}"  
-                                        id="datetimepicker" 
+
+                                        <input type="text"
+                                        :state="getValidationState(validationContext)"
+                                        aria-describedby="date-feedback"
+                                        class="form-control"
+                                        placeholder="{{ __('translate.Select_Date') }}"
+                                        id="datetimepicker"
                                         v-model="payment.date">
                                         <span class="error">@{{  validationContext.errors[0] }}</span>
                                     </div>
@@ -96,17 +98,17 @@
                                         <span class="badge badge-danger">reste à payer : {{$currency}} @{{ sell_due }}</span>
                                     </validation-provider>
                                 </div>
-    
+
                                 <div class="form-group col-md-6">
                                     <validation-provider name="Payment choice" rules="required"
                                         v-slot="{ valid, errors }">
                                         <label> {{ __('translate.Payment_choice') }}<span
                                                 class="field_required">*</span></label>
-                                        <v-select @input="Selected_Payment_Method" 
+                                        <v-select @input="Selected_Payment_Method"
                                              placeholder="{{ __('translate.Choose_Payment_Choice') }}"
                                             :class="{'is-invalid': !!errors.length}"
                                             :state="errors[0] ? false : (valid ? true : null)"
-                                            v-model="payment.payment_method_id" :reduce="(option) => option.value" 
+                                            v-model="payment.payment_method_id" :reduce="(option) => option.value"
                                             :options="payment_methods.map(payment_methods => ({label: payment_methods.title, value: payment_methods.id}))">
 
                                         </v-select>
@@ -114,18 +116,18 @@
                                     </validation-provider>
                                 </div>
 
-                                
+
                                 <div class="form-group col-md-6">
                                     <label> {{ __('translate.Account') }} </label>
-                                    <v-select 
+                                    <v-select
                                             placeholder="{{ __('translate.Choose_Account') }}"
-                                        v-model="payment.account_id" :reduce="(option) => option.value" 
+                                        v-model="payment.account_id" :reduce="(option) => option.value"
                                         :options="accounts.map(accounts => ({label: accounts.account_name, value: accounts.id}))">
 
                                     </v-select>
                                 </div>
 
-    
+
                                 <div class="form-group col-md-12">
                                     <label for="note">{{ __('translate.Please_provide_any_details') }}
                                     </label>
@@ -133,25 +135,25 @@
                                         id="note"
                                         placeholder="{{ __('translate.Please_provide_any_details') }}"></textarea>
                                 </div>
-    
+
                                 <div class="col-lg-6">
                                     <button type="submit" class="btn btn-primary" :disabled="paymentProcessing">
                                         <span v-if="paymentProcessing" class="spinner-border spinner-border-sm"
                                             role="status" aria-hidden="true"></span> <i class="i-Yes me-2 font-weight-bold"></i>
                                         {{ __('translate.Submit') }}
                                     </button>
-    
+
                                 </div>
-    
+
                             </div>
-    
+
                         </form>
                     </div>
                 </div>
             </div>
         </div>
     </validation-observer>
-    
+
     <!-- Modal add return payment -->
     <validation-observer ref="add_payment_return">
         <div class="modal fade" id="add_payment_return" tabindex="-1" role="dialog" aria-labelledby="add_payment_return"
@@ -165,20 +167,20 @@
                     <div class="modal-body">
                         <form @submit.prevent="Submit_Payment_sell_return_due()">
                             <div class="row">
-    
+
 
                                  <!-- Date -->
                                 <div class="col-md-6">
                                     <validation-provider name="date" rules="required" v-slot="validationContext">
                                     <div class="form-group">
                                         <label for="picker3">{{ __('translate.Date') }}</label>
-                                        
-                                        <input type="text" 
-                                        :state="getValidationState(validationContext)" 
-                                        aria-describedby="date-feedback" 
-                                        class="form-control" 
-                                        placeholder="{{ __('translate.Select_Date') }}"  
-                                        id="datetimepicker" 
+
+                                        <input type="text"
+                                        :state="getValidationState(validationContext)"
+                                        aria-describedby="date-feedback"
+                                        class="form-control"
+                                        placeholder="{{ __('translate.Select_Date') }}"
+                                        id="datetimepicker"
                                         v-model="payment_return.date">
                                         <span class="error">@{{  validationContext.errors[0] }}</span>
                                     </div>
@@ -206,11 +208,11 @@
                                         v-slot="{ valid, errors }">
                                         <label> {{ __('translate.Payment_choice') }}<span
                                                 class="field_required">*</span></label>
-                                        <v-select @input="Selected_return_Payment_Method" 
+                                        <v-select @input="Selected_return_Payment_Method"
                                              placeholder="{{ __('translate.Choose_Payment_Choice') }}"
                                             :class="{'is-invalid': !!errors.length}"
                                             :state="errors[0] ? false : (valid ? true : null)"
-                                            v-model="payment_return.payment_method_id" :reduce="(option) => option.value" 
+                                            v-model="payment_return.payment_method_id" :reduce="(option) => option.value"
                                             :options="payment_methods.map(payment_methods => ({label: payment_methods.title, value: payment_methods.id}))">
 
                                         </v-select>
@@ -218,18 +220,18 @@
                                     </validation-provider>
                                 </div>
 
-                                
+
                                 <div class="form-group col-md-6">
                                     <label> {{ __('translate.Account') }} </label>
-                                    <v-select 
+                                    <v-select
                                             placeholder="{{ __('translate.Choose_Account') }}"
-                                        v-model="payment_return.account_id" :reduce="(option) => option.value" 
+                                        v-model="payment_return.account_id" :reduce="(option) => option.value"
                                         :options="accounts.map(accounts => ({label: accounts.account_name, value: accounts.id}))">
 
                                     </v-select>
                                 </div>
 
-    
+
                                 <div class="form-group col-md-12">
                                     <label for="note">{{ __('translate.Please_provide_any_details') }}
                                     </label>
@@ -237,18 +239,18 @@
                                         id="note"
                                         placeholder="{{ __('translate.Please_provide_any_details') }}"></textarea>
                                 </div>
-    
+
                                 <div class="col-lg-6">
                                     <button type="submit" class="btn btn-primary" :disabled="payment_return_Processing">
                                         <span v-if="payment_return_Processing" class="spinner-border spinner-border-sm"
                                             role="status" aria-hidden="true"></span> <i class="i-Yes me-2 font-weight-bold"></i>
                                         {{ __('translate.Submit') }}
                                     </button>
-    
+
                                 </div>
-    
+
                             </div>
-    
+
                         </form>
                     </div>
                 </div>
@@ -256,7 +258,7 @@
         </div>
     </validation-observer>
 </div>
-     
+
 
 @endsection
 
@@ -282,7 +284,7 @@
             client_datatable();
         });
 
-     
+
 
        //Get Data
        function client_datatable(){
@@ -293,7 +295,7 @@
                 'columnDefs': [
                     {
                         'targets': [0],
-                        'visible': false,
+                        'visible': true,
                         'searchable': false,
                     },
                     {
@@ -312,19 +314,21 @@
                 },
 
                 columns: [
-                    {data: 'id' , className: "d-none"},
-                    {data: 'action'},
+                    {data: 'id'},
                     {data: 'photo'},
                     {data: 'code'},
                     {data: 'username'},
                     {data: 'phone'},
                     {data: 'sell_due'},
                     {data: 'return_due'},
+                    {data: 'paid_due'},
+                    {data: 'total_due'},
                     {data: 'status'},
-                
+                    {data: 'action'},
+
                 ],
-            
-                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+
+                lengthMenu: [[50, 75, 100, -1], [50, 75, 100, "All"]],
                 dom: "<'row'<'col-sm-12 col-md-7'lB><'col-sm-12 col-md-5 p-0'f>>rtip",
                 oLanguage: {
                     sEmptyTable: "{{ __('datatable.sEmptyTable') }}",
@@ -332,7 +336,7 @@
                     sInfoEmpty: "{{ __('datatable.sInfoEmpty') }}",
                     sInfoFiltered: "{{ __('datatable.sInfoFiltered') }}",
                     sInfoThousands: "{{ __('datatable.sInfoThousands') }}",
-                    sLengthMenu: "_MENU_", 
+                    sLengthMenu: "_MENU_",
                     sLoadingRecords: "{{ __('datatable.sLoadingRecords') }}",
                     sProcessing: "{{ __('datatable.sProcessing') }}",
                     sSearch: "",
@@ -402,7 +406,7 @@
             });
         }
 
-     
+
         // event reload Datatatble
         $(document).bind('event_client', function (e) {
             $('#client_list_table').DataTable().destroy();
@@ -422,7 +426,7 @@
                 if(app.sell_due > 0){
                     $('#add_payment_sale').modal('show');
                 }else{
-                    toastr.warning('Pas de dettes');
+                    toastr.warning('{{ __('translate.No_debts') }}');
                 }
             }, 1000);
         });
@@ -447,7 +451,7 @@
                 if(app.return_due > 0){
                     $('#add_payment_return').modal('show');
                 }else{
-                    toastr.warning('Pas de dettes');
+                    toastr.warning('{{ __('translate.No_debts') }}');
                 }
             }, 1000);
         });
@@ -484,7 +488,7 @@
             selectedIds:[],
             payment_methods:[],
             accounts:[],
-            clients: {}, 
+            clients: {},
             payment: {
                 date: moment().format('YYYY-MM-DD HH:mm'),
                 client_id: "",
@@ -505,10 +509,10 @@
             return_due:0,
 
         },
-       
+
         methods: {
 
-            
+
             Selected_Payment_Method(value) {
                 if (value === null) {
                     this.payment.payment_method_id = "";
@@ -536,7 +540,7 @@
                     } else if (this.payment.montant > this.sell_due) {
                         toastr.warning('The amount paid is greater than the remainder to be paid');
                         this.payment.montant = 0;
-                    } 
+                    }
                 },
 
                  //------ Validate Form Submit_Payment
@@ -550,8 +554,8 @@
                             this.payment.montant = 0;
                         }else{
                             this.Create_Payment();
-                        } 
-                        
+                        }
+
                     });
                 },
 
@@ -599,7 +603,7 @@
 
 
 
-             
+
             //----------------------------------------- get_client_debt_total  -------------------------------\\
             get_client_debt_total(id) {
                 axios
@@ -610,7 +614,7 @@
                     this.payment.montant = parseFloat(response.data.sell_due);
                     this.payment_methods   = response.data.payment_methods;
                     this.accounts          = response.data.accounts;
-                       
+
                     })
                     .catch(() => {
                     setTimeout(() => NProgress.done(), 500);
@@ -625,7 +629,7 @@
                     if (!success) {
                         toastr.error('{{ __('translate.Please_fill_the_form_correctly') }}');
                     } else if (this.payment_return.montant > this.return_due) {
-                    
+
                     toastr.error('The amount to be paid is greater than the total debt');
                     this.payment_return.montant = 0;
                     }
@@ -645,7 +649,7 @@
                 } else if (this.payment_return.montant > this.return_due) {
                     toastr.error('The amount to be paid is greater than the total debt');
                     this.payment_return.montant = 0;
-                } 
+                }
             },
 
             //-------------------------------- reset_Form_payment-------------------------------\\
@@ -661,7 +665,7 @@
                 this.return_due = 0;
             },
 
-              
+
             //----------------------------------------- get_client_debt_return_total  -------------------------------\\
             get_client_debt_return_total(id) {
                 axios
@@ -705,7 +709,7 @@
                     this.payment_return_Processing = false;
                     });
             },
-                
+
              //--------------------------------- Remove Client ---------------------------\\
             Remove_Client(id) {
                 swal({
@@ -732,8 +736,8 @@
                             });
                     });
                 },
-          
-           
+
+
         },
         //-----------------------------Autoload function-------------------
         created() {

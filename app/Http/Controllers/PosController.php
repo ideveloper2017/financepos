@@ -539,7 +539,17 @@ class PosController extends Controller
                 ->where('sales.client_id', $sale->client_id)
                 ->sum('paid_amount');
 
-            $sell_due =  ($total_amount) - $total_paid;
+            $total_amount_return = DB::table('sale_returns')
+                ->where('deleted_at', '=', null)
+                ->where('client_id', $sale->client_id)
+                ->sum('GrandTotal');
+
+            $total_paid_return = DB::table('sale_returns')
+                ->where('sale_returns.deleted_at', '=', null)
+                ->where('sale_returns.client_id', $sale->client_id)
+                ->sum('paid_amount');
+
+            $sell_due =  ($total_amount-$total_amount_return) - ($total_paid-$total_paid_return);
 
             $dueclient=$sell_due;
 
@@ -563,31 +573,24 @@ class PosController extends Controller
             $item['paid_amount']            = $this->render_price_with_symbol_placement(number_format($sale->paid_amount, 2, '.', ','));
             $item['due']                    = $this->render_price_with_symbol_placement(number_format($sale->GrandTotal - $sale->paid_amount, 2, '.', ','));
             $item['client_due']             = $this->render_price_with_symbol_placement(number_format($sell_due, 2, '.', ','));
-            $item['current_total_amount']             = $this->render_price_with_symbol_placement(number_format($current_sell_due, 2, '.', ','));
+            $item['current_total_amount']   = $this->render_price_with_symbol_placement(number_format($current_sell_due, 2, '.', ','));
             foreach ($sale['details'] as $detail) {
-
                 $unit = Unit::where('id', $detail->sale_unit_id)->first();
                 if ($detail->product_variant_id) {
-
                     $productsVariants = ProductVariant::where('product_id', $detail->product_id)
                         ->where('id', $detail->product_variant_id)->first();
-
                         $data['code'] = $productsVariants->code;
                         $data['name'] = '['.$productsVariants->name . '] ' . $detail['product']['name'];
-
                     } else {
                         $data['code'] = $detail['product']['code'];
                         $data['name'] = $detail['product']['name'];
                     }
-
-                $data['price'] = $this->render_price_with_symbol_placement(number_format($detail->price, 2, '.', ','));
-                $data['total'] = $this->render_price_with_symbol_placement(number_format( $detail->quantity*$detail->price, 2, '.', ','));
+                $data['price'] = $this->render_price_with_symbol_placement($detail->price);
+                $data['total'] = $this->render_price_with_symbol_placement($detail->quantity*$detail->price);
                 $data['quantity'] = $detail->quantity;
                 $data['unit_sale'] = $unit?$unit->ShortName:'';
-
                 $data['is_imei'] = $detail['product']['is_imei'];
                 $data['imei_number'] = $detail->imei_number;
-
                 $details[] = $data;
             }
 

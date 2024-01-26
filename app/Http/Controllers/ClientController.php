@@ -350,15 +350,17 @@ class ClientController extends Controller
                     ->where('sale_returns.client_id', $client->id)
                     ->sum('paid_amount');
                 $total_return_Due = $total_amount_return - $total_paid_return;
-                $sell_due = $total_amount - $total_paid;
-                $item['sell_due'] =  $this->render_price_with_symbol_placement(number_format($sell_due-$total_return_Due, 2, '.', ','));
+                $sell_due = $total_amount-$total_paid;
+                $item['sell_due'] =  $this->render_price_with_symbol_placement(number_format($total_amount, 2, '.', ','));
                 //return due
                 $item['return_due'] =  $this->render_price_with_symbol_placement(number_format($total_return_Due, 2, '.', ','));
+                $item['paid_due'] =  $this->render_price_with_symbol_placement(number_format($total_paid, 2, '.', ','));
+                $item['total_due'] =  $this->render_price_with_symbol_placement(number_format($sell_due-$total_return_Due, 2, '.', ','));
                 //status
                 if($client->status == 1){
-                    $item['status'] = '<span class="badge badge-success">Client Actif</span>';
+                    $item['status'] = '<span class="badge badge-success">'.trans('translate.Active').'</span>';
                 }else{
-                    $item['status'] = '<span class="badge badge-warning">Client bloqué</span>';
+                    $item['status'] = '<span class="badge badge-warning">'.trans('translate.Inactive').'</span>';
                 }
 
                 $item['action'] =  '<div class="dropdown">
@@ -573,11 +575,29 @@ class ClientController extends Controller
 
         }
     }
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
+    public function get_Payments_Sale(Request $request, $id)
+    {
+
+        $Sale = Sale::findOrFail($id);
+        $payments = PaymentSale::with('sale')
+            ->where('sale_id', $id)
+            ->orderBy('id', 'DESC')->get();
+
+        $due = $Sale->GrandTotal - $Sale->paid_amount;
+
+        $payment_methods = PaymentMethod::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','title']);
+        $accounts = Account::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','account_name']);
+
+
+        return response()->json([
+            'payments' => $payments,
+            'due' => $due,
+            'payment_methods' => $payment_methods,
+            'accounts' => $accounts,
+        ]);
+
+    }
     public function create()
     {
         $user_auth = auth()->user();
@@ -697,15 +717,14 @@ class ClientController extends Controller
 
             $total_return_Due = $total_amount_return - $total_paid_return;
 
-            $total_debt =  $total_amount - $total_paid;
+            $total_debt =  ($total_amount-$total_paid);
 
             $item['total_amount'] = $this->render_price_with_symbol_placement(number_format($total_amount, 2, '.', ','));
             $item['total_paid']   = $this->render_price_with_symbol_placement(number_format($total_paid, 2, '.', ','));
-            $item['total_debt']   = $this->render_price_with_symbol_placement(number_format($total_debt, 2, '.', ','));
+            $item['total_debt']   = $this->render_price_with_symbol_placement(number_format($total_debt-$total_return_Due, 2, '.', ','));
 
             $client_data[] = $item;
 
-            $sales=Sale::get();
             return view('clients.details_client', [
                 'client_id' => $id,
                 'client_data' => $client_data[0],
@@ -836,23 +855,30 @@ class ClientController extends Controller
             $client = Client::findOrFail($id);
             $sell_due = 0;
 
-            $item['total_amount'] = DB::table('sales')
-                ->where('deleted_at', '=', null)
+            $item['total_amount'] = Sale::where('deleted_at', '=', null)
                 ->where('client_id', $id)
                 ->sum('GrandTotal');
 
-            $item['total_paid'] = DB::table('sales')
-                ->where('sales.deleted_at', '=', null)
+            $item['total_paid'] = Sale::where('sales.deleted_at', '=', null)
+                ->where('sales.client_id', $id)
+                ->sum('paid_amount');
+
+            $item['return_amount'] = SaleReturn::where('deleted_at', '=', null)
+                ->where('client_id', $id)
+                ->sum('GrandTotal');
+
+            $item['return_paid'] = SaleReturn::where('sales.deleted_at', '=', null)
                 ->where('sales.client_id', $id)
                 ->sum('paid_amount');
 
             $sell_due =  $item['total_amount'] - $item['total_paid'];
+            $return_due= $item['return_amount']- $item['return_paid'];
 
             $payment_methods = PaymentMethod::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','title']);
             $accounts = Account::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','account_name']);
 
             return response()->json([
-                'sell_due' => $sell_due,
+                'sell_due' => $sell_due-$return_due,
                 'payment_methods' => $payment_methods,
                 'accounts' => $accounts,
             ]);
@@ -861,39 +887,7 @@ class ClientController extends Controller
         return abort('403', __('You are not authorized'));
     }
 
-    public function get_client_payments($id){
 
-//        $user_auth = auth()->user();
-//        if ($user_auth->can('pay_sale_due')){
-//
-//            $client = Client::findOrFail($id);
-//            $sell_due = 0;
-//
-//            $item['total_amount'] = Sale::where('deleted_at', '=', null)
-//                ->where('client_id', $id)
-//                ->sum('GrandTotal');
-//
-//            $item['total_paid'] = DB::table('sales')
-//                ->where('sales.deleted_at', '=', null)
-//                ->where('sales.client_id', $id)
-//                ->sum('paid_amount');
-//
-//            $sell_due =  $item['total_amount'] - $item['total_paid'];
-//            $payment_methods = PaymentMethod::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','title']);
-//            $accounts = Account::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','account_name']);
-//
-//            return response()->json([
-//                'sell_due' => $sell_due,
-//                'payment_methods' => $payment_methods,
-//                'accounts' => $accounts,
-//            ]);
-//
-//        }
-//        return abort('403', __('You are not authorized'));
-        $payments=PaymentSale::query()->get();
-
-    }
-     //------------- clients_pay_due -------------\\
 
      public function clients_pay_due(Request $request)
      {
@@ -1209,5 +1203,8 @@ class ClientController extends Controller
             return $amount . ' ' . $this->currency;
         }
     }
+
+
+
 
 }

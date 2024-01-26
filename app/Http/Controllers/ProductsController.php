@@ -143,7 +143,7 @@ class ProductsController extends Controller
                 ->with('unit', 'category', 'brand')
                 ->offset($start)
                 ->limit($limit)
-                 ->orderBy('products.id','desc')
+                 ->orderBy('products.id','asc')
                 ->orderBy($order, $dir)
                 ->get();
 
@@ -314,7 +314,7 @@ class ProductsController extends Controller
                     }),
                 ],
                 'name'         => 'required',
-                'model'        => 'required',
+          //      'model'        => 'required',
                 'category_id'  => 'required',
                 'type'         => 'required',
                 'tax_method'   => 'required',
@@ -466,7 +466,7 @@ class ProductsController extends Controller
                     //-- Field Required
                     $Product->type         = $request['type'];
                     $Product->name         = $request['name'];
-                    $Product->model         = $request['model'];
+                //    $Product->model         = $request['model'];
                     $Product->code         = $request['code'];
                     $Product->Type_barcode = 'CODE128';
                     $Product->category_id  = $request['category_id'];
