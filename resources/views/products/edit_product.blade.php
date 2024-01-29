@@ -44,6 +44,20 @@
                         </div>
 
                         <div class="form-group col-md-4">
+                            <label for="code">SKU <span class="field_required">*</span></label>
+
+                            <div class="input-group">
+                                <div class="input-group mb-3">
+                                    <input v-model.number="product.sku" type="text" readonly disabled class="form-control" placeholder="SKU" aria-label="generate the barcode" aria-describedby="basic-addon2">
+
+                                </div>
+                            </div>
+                            <span class="error" v-if="errors && errors.code">
+                                @{{ errors.code[0] }}
+                            </span>
+                        </div>
+
+                        <div class="form-group col-md-4">
                             <label>{{ __('translate.Category') }} <span class="field_required">*</span></label>
                             <v-select placeholder="{{ __('translate.Choose_Category') }}" v-model="product.category_id"
                                 :reduce="(option) => option.value"

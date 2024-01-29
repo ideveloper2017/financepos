@@ -476,7 +476,7 @@ class PermissionsSeeder extends Seeder
 			'name'  => 'reports_devis',
 			'guard_name'  => 'web',
 		],
-		
+
 		[
 			'id'    => 93,
 			'name'  => 'reports_alert_qty',
@@ -487,7 +487,7 @@ class PermissionsSeeder extends Seeder
 			'name'  => 'pos',
 			'guard_name'  => 'web',
 		],
-		
+
 		[
 			'id'    => 95,
 			'name'  => 'report_profit',
@@ -596,15 +596,6 @@ class PermissionsSeeder extends Seeder
 			'name'  => 'pos_settings',
 			'guard_name'  => 'web',
 		],
-		
-
-		
-
-
-
-
-
-
 
 		//---------------------------------------
 
@@ -613,8 +604,8 @@ class PermissionsSeeder extends Seeder
 			'name'  => 'adjustment_view_own',
 			'guard_name'  => 'web',
 		],
-		
-		
+
+
 		[
 			'id'    => 201,
 			'name'  => 'transfer_view_own',
@@ -660,8 +651,8 @@ class PermissionsSeeder extends Seeder
 			'name'  => 'attendance_view_own',
 			'guard_name'  => 'web',
 		],
-		
-		
+
+
 		)
 	);
     }

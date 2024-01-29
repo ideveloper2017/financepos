@@ -32,6 +32,7 @@
                 <th>ID</th>
                 <th>{{ __('translate.Image') }}</th>
                 <th>{{ __('translate.type') }}</th>
+                <th>SKU</th>
                 <th>{{ __('translate.Name') }}</th>
                 <th>{{ __('translate.Code') }}</th>
                 <th>{{ __('translate.Category') }}</th>
@@ -177,6 +178,7 @@
                     {data: 'id' , className: "d-none"},
                     {data: 'image'},
                     {data: 'type'},
+                    {data: 'sku'},
                     {data: 'name'},
                     {data: 'code'},
                     {data: 'category'},

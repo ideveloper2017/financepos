@@ -22,7 +22,7 @@ class SettingController extends Controller
     {
         $user_auth = auth()->user();
 		if ($user_auth->can('settings')){
-            
+
             $setting_data = Setting::where('deleted_at', '=', null)->first();
 
             $backup_settings['dump_path'] = env('DUMP_PATH');
@@ -40,6 +40,7 @@ class SettingController extends Controller
             $setting['CompanyName']      = $setting_data->CompanyName;
             $setting['CompanyPhone']     = $setting_data->CompanyPhone;
             $setting['CompanyAdress']    = $setting_data->CompanyAdress;
+            $setting['product_sku_prefix']= $setting_data->product_sku_prefix;
             $setting['logo']             = "";
             $setting['warehouse_id']     = $setting_data->warehouse_id;
             $setting['client_id']        = $setting_data->client_id;
@@ -64,8 +65,8 @@ class SettingController extends Controller
             $currencies = Currency::where('deleted_at', null)->get(['id', 'name']);
             $clients = client::where('deleted_at', '=', null)->get(['id', 'username']);
             $warehouses = Warehouse::where('deleted_at', '=', null)->get(['id', 'name']);
-            
-            return view('settings.system_settings_list', 
+
+            return view('settings.system_settings_list',
             compact('setting','backup_settings','email_settings','currencies','clients','warehouses','zones_array'));
 
         }
@@ -73,20 +74,20 @@ class SettingController extends Controller
     }
 
 
-    
+
      //-------------- Get Pos Settings ---------------\\
 
      public function get_pos_Settings(Request $request)
      {
         $user_auth = auth()->user();
 		if ($user_auth->can('pos_settings')){
- 
+
             $pos_settings = PosSetting::where('deleted_at', '=', null)->first();
 
             return view('settings.pos_settings', compact('pos_settings'));
         }
         return abort('403', __('You are not authorized'));
-    
+
     }
 
 
@@ -126,24 +127,12 @@ class SettingController extends Controller
         return abort('403', __('You are not authorized'));
 
     }
-    
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         //
@@ -186,6 +175,7 @@ class SettingController extends Controller
             $request->validate([
                 'CompanyName'      => 'required|string|max:255',
                 'CompanyPhone'     => 'nullable|numeric',
+                'product_sku_prefix'=>'required|string',
                 'email'            => 'required|string|email|max:255',
                 'app_name'         => 'required|string|max:20',
                 'CompanyAdress'    => 'required|string',
@@ -194,7 +184,7 @@ class SettingController extends Controller
                 'symbol_placement' => 'required',
                 'logo'             => 'nullable|image|mimes:jpeg,png,jpg,bmp,gif,svg|max:2048',
             ]);
-            
+
             $setting = Setting::findOrFail($id);
             $currentAvatar = $setting->logo;
 
@@ -202,7 +192,7 @@ class SettingController extends Controller
                 if ($request->logo != $currentAvatar) {
 
                     $image = $request->file('logo');
-                    $filename = time().'.'.$image->extension();  
+                    $filename = time().'.'.$image->extension();
                     $image->move(public_path('/images'), $filename);
                     $path = public_path() . '/images';
 
@@ -226,25 +216,31 @@ class SettingController extends Controller
                 $invoice_footer = $request['invoice_footer'];
             }
 
+            if ($request['product_sku_prefix'] == 'null' || $request['product_sku_prefix'] == '') {
+                $product_sku_prefix = NULL;
+            } else {
+                $product_sku_prefix = $request['product_sku_prefix'];
+            }
+
             if ($request['currency_id'] == 'null' || $request['currency_id'] == '') {
                 $currency_id = NULL;
             } else {
                 $currency_id = $request['currency_id'];
             }
-    
+
             if ($request['client_id'] == 'null' || $request['client_id'] == '') {
                 $client_id = NULL;
             } else {
                 $client_id = $request['client_id'];
             }
-    
+
             if ($request['warehouse_id'] == 'null' || $request['warehouse_id'] == '') {
                 $warehouse_id = NULL;
             } else {
                 $warehouse_id = $request['warehouse_id'];
             }
 
-    
+
             if ($request['default_language'] == 'null' || $request['default_language'] == '') {
                 $default_language = 'en';
             } else {
@@ -268,16 +264,17 @@ class SettingController extends Controller
                 'app_name'          => $request['app_name'],
                 'CompanyPhone'      => $request['CompanyPhone'],
                 'CompanyAdress'     => $request['CompanyAdress'],
+                'product_sku_prefix'=> $product_sku_prefix,
                 'footer'            => $request['footer'],
                 'developed_by'      => $request['developed_by'],
                 'invoice_footer'    => $invoice_footer,
                 'logo'              => $filename,
             ]);
-    
+
             $this->setEnvironmentValue([
                 'APP_TIMEZONE' => $request['timezone'] !== null?'"' . $request['timezone'] . '"':'"UTC"',
             ]);
-    
+
             Artisan::call('config:cache');
             Artisan::call('config:clear');
 
@@ -316,14 +313,14 @@ class SettingController extends Controller
 
             return response()->json(['success' => true]);
 
-            
+
 
         }
         return abort('403', __('You are not authorized'));
     }
 
 
-    
+
     //-------------- Clear_Cache ---------------\\
 
     public function Clear_Cache(Request $request)
@@ -342,29 +339,29 @@ class SettingController extends Controller
            $str .= "\r\n";
            if (count($values) > 0) {
                foreach ($values as $envKey => $envValue) {
-       
+
                    $keyPosition = strpos($str, "$envKey=");
                    $endOfLinePosition = strpos($str, "\n", $keyPosition);
                    $oldLine = substr($str, $keyPosition, $endOfLinePosition - $keyPosition);
-       
+
                    if (is_bool($keyPosition) && $keyPosition === false) {
                        // variable doesnot exist
                        $str .= "$envKey=$envValue";
                        $str .= "\r\n";
                    } else {
-                       // variable exist                    
+                       // variable exist
                        $str = str_replace($oldLine, "$envKey=$envValue", $str);
-                   }            
+                   }
                }
            }
-       
+
            $str = substr($str, 0, -1);
            if (!file_put_contents($envFile, $str)) {
                return false;
            }
-       
-           app()->loadEnvironmentFrom($envFile);    
-       
+
+           app()->loadEnvironmentFrom($envFile);
+
            return true;
        }
 }

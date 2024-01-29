@@ -116,6 +116,7 @@ if ($installed === true) {
                     Route::post('get_product_datatable', 'ProductsController@get_product_datatable')->name('products_datatable');
                     Route::get('show_product_data/{id}/{variant_id}', 'ProductsController@show_product_data');
 
+                    Route::get('get_sku_code', 'ProductsController@get_sku_code');
                     Route::get('products_by_Warehouse/{id}', 'ProductsController@Products_by_Warehouse');
                     Route::get('print_labels', 'ProductsController@print_labels')->name('print_labels');
                     Route::get('import_products', 'ProductsController@import_products_page');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -159,6 +160,7 @@ class ProductsController extends Controller
                       $item['type']  = 'Single';
                       $item['name'] = $product->name;
                       $item['code'] = $product->code;
+                      $item['sku'] = $product->sku;
                       $item['cost']  = $this->render_price_with_symbol_placement(number_format($product->cost, 2, '.', ','), $symbol_placement);
                       $item['price'] = $this->render_price_with_symbol_placement(number_format($product->price, 2, '.', ','), $symbol_placement);
 
@@ -314,7 +316,8 @@ class ProductsController extends Controller
                     }),
                 ],
                 'name'         => 'required',
-          //      'model'        => 'required',
+          //      'model'      => 'required',
+                 'sku'         =>'required',
                 'category_id'  => 'required',
                 'type'         => 'required',
                 'tax_method'   => 'required',
@@ -468,6 +471,7 @@ class ProductsController extends Controller
                     $Product->name         = $request['name'];
                 //    $Product->model         = $request['model'];
                     $Product->code         = $request['code'];
+                    $Product->sku          = $request['sku'];
                     $Product->Type_barcode = 'CODE128';
                     $Product->category_id  = $request['category_id'];
                     $Product->brand_id     = $request['brand_id'] ?$request['brand_id']:NULL;
@@ -774,6 +778,7 @@ class ProductsController extends Controller
             $item['id'] = $Product->id;
             $item['type'] = $Product->type;
             $item['code'] = $Product->code;
+            $item['sku'] = $Product->sku;
             $item['Type_barcode'] = $Product->Type_barcode;
             $item['qty_min'] = $Product->qty_min;
             $item['name'] = $Product->name;
@@ -887,7 +892,8 @@ class ProductsController extends Controller
                     }),
                 ],
                 'name'        => 'required',
-                'model'        => 'required',
+//                'model'        => 'required',
+                'sku'        => 'required',
                 'category_id' => 'required',
                 'tax_method'  => 'required',
                 'type'        => 'required',
@@ -1041,7 +1047,8 @@ class ProductsController extends Controller
                     //-- Update Product
                     $Product->type        = $request['type'];
                     $Product->name        = $request['name'];
-                    $Product->model       = $request['model'];
+//                    $Product->model       = $request['model'];
+                    $Product->sku         = $request['sku'];
                     $Product->code        = $request['code'];
                     $Product->category_id = $request['category_id'];
                     $Product->brand_id    = $request['brand_id']?$request['brand_id']:NULL;
@@ -1774,6 +1781,15 @@ class ProductsController extends Controller
        } else {
            return $gen_code;
        }
+
+    }
+
+    public function get_sku_code()
+    {
+        $setting_data = Setting::where('deleted_at', '=', null)->first();
+        $sku=Product::latest()->first();
+        $gen_code = number_format(($sku->id+1), 0, '', '');
+        return $setting_data->product_sku_prefix.''.$gen_code;
 
     }
 

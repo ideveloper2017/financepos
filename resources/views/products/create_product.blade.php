@@ -46,6 +46,21 @@
                             </span>
                         </div>
 
+
+                        <div class="form-group col-md-4">
+                            <label for="code">SKU <span class="field_required">*</span></label>
+
+                            <div class="input-group">
+                                <div class="input-group mb-3">
+                                    <input v-model.number="product.sku" type="text" readonly disabled class="form-control" placeholder="SKU" aria-label="generate the barcode" aria-describedby="basic-addon2">
+
+                                </div>
+                            </div>
+                            <span class="error" v-if="errors && errors.code">
+                                @{{ errors.code[0] }}
+                            </span>
+                        </div>
+
                         <div class="form-group col-md-4">
                             <label>{{ __('translate.Category') }} <span class="field_required">*</span></label>
                             <v-select placeholder="{{ __('translate.Choose_Category') }}" v-model="product.category_id"
@@ -352,6 +367,7 @@
                   type: "is_single",
                   name: "",
                   code: "",
+                  sku:"",
                   Type_barcode: "",
                   cost: "",
                   price: "",
@@ -377,7 +393,9 @@
               },
           },
 
-
+          mounted() {
+              this.getProductSkuCode();
+          },
 
           methods: {
 
@@ -390,6 +408,17 @@
                         (Math.pow(10, this.len) - Math.pow(10, this.len - 1) - 1)
                 );
             },
+
+             getProductSkuCode(){
+                 axios
+                     .get("/products/get_sku_code")
+                     .then(response => {
+
+                         this.product.sku = response.data;
+                    })
+                     .catch(error => {
+                     });
+             },
 
             add_variant(tag) {
                 if (
@@ -545,6 +574,8 @@
 
           },
           //-----------------------------Autoload function-------------------
+
+
           created() {
           }
 

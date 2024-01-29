@@ -1737,4 +1737,5 @@ return [
     'Total Purchases' => 'Jami xaridlar',
     'Search' => 'Qidirmoq...',
     'EXPORT' => 'EKSPORT',
+    'Product_Sku_Prefix'=>'Mahsulot Sku prefiksi'
 ];

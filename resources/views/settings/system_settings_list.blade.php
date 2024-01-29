@@ -110,16 +110,8 @@
                       v-model="setting.default_language" :reduce="(option) => option.value" :options="
                               [
                                 {label: 'English', value: 'en'},
-                                {label: 'French', value: 'fr'},
-                                {label: 'Arabic', value: 'ar'},
-                                {label: 'Turkish', value: 'tur'},
-                                {label: 'Hindi', value: 'hn'},
-                                {label: 'German', value: 'gr'},
-                                {label: 'Spanish', value: 'es'},
-                                {label: 'Italien', value: 'it'},
-                                {label: 'Indonesian', value: 'Ind'},
                                 {label: 'Russian', value: 'ru'},
-                                {label: 'Bangla', value: 'ba'},
+                                {label: 'O`zbek', value: 'uz'},
                               ]">
                   </v-select>
                   <span class="error" v-if="errors_settings && errors_settings.default_language">
@@ -136,7 +128,7 @@
                     </v-select>
                 </div>
 
-            
+
 
                <!-- Default Warehouse -->
                  <div class="form-group col-md-4">
@@ -173,6 +165,15 @@
                         @{{ errors_settings.symbol_placement[0] }}
                     </span>
                 </div>
+                <div class="form-group col-md-4">
+                    <label for="CompanyAdress">{{ __('translate.Product_Sku_Prefix') }}
+                        <span class="field_required">*</span></label>
+                    <input type="text" v-model="setting.product_sku_prefix" class="form-control" name="product_sku_prefix"
+                              id="product_sku_prefix" placeholder="{{ __('translate.Product_Sku_Prefix') }}"/>
+                    <span class="error" v-if="errors_settings && errors_settings.product_sku_prefix">
+                  @{{ errors_settings.Product_Sku_Prefix[0] }}
+                </span>
+                </div>
 
               <div class="form-group col-md-12">
                 <label for="CompanyAdress">{{ __('translate.Company_Adress') }}
@@ -183,6 +184,8 @@
                   @{{ errors_settings.CompanyAdress[0] }}
                 </span>
               </div>
+
+
 
             </div>
 
@@ -311,7 +314,7 @@
   {{-- Backup Settings --}}
   <div class="row mt-5">
       <div class="col-md-12">
-  
+
         <div class="card">
           <div class="card-header">
             <h4>{{ __('translate.Backup_Settings') }}</h4>
@@ -320,7 +323,7 @@
           <div class="card-body">
             <form @submit.prevent="Update_Backup_Settings()" enctype="multipart/form-data">
               <div class="row">
-  
+
                 <div class="form-group col-md-6">
                   <label for="dump_path">{{ __('translate.DUMP_PATH') }} <span class="field_required">*</span></label>
                   <input type="text" v-model="backup_settings.dump_path" class="form-control" id="dump_path"
@@ -330,7 +333,7 @@
                   </span>
                 </div>
               </div>
-              
+
               <div class="row mt-3">
                 <div class="col-md-12">
                     <ul>
@@ -342,7 +345,7 @@
               </div>
 
               <div class="row mt-3">
-  
+
                 <div class="col-md-6">
                   <button type="submit" class="btn btn-primary"> <i class="i-Yes me-2 font-weight-bold"></i> {{ __('translate.Submit') }}
                   </button>
@@ -405,16 +408,16 @@
             email_settings: @json($email_settings),
             backup_settings: @json($backup_settings),
         },
-       
+
         methods: {
 
 
             changeLogo(e){
                 let file = e.target.files[0];
                 this.setting.logo = file;
-            }, 
+            },
 
-         
+
                 //---------------------------------- Clear_Cache ----------------\\
             Clear_Cache() {
                 var self = this;
@@ -429,7 +432,7 @@
                         self.Submit_Processing_Clear_Cache = false;
                         toastr.error('{{ __('translate.There_was_something_wronge') }}');
                     });
-            },   
+            },
 
 
            //----------------------- Update setting ---------------------------\\
@@ -451,13 +454,14 @@
                 self.data.append("invoice_footer", self.setting.invoice_footer);
                 self.data.append("timezone", self.setting.timezone);
                 self.data.append("symbol_placement", self.setting.symbol_placement);
+                self.data.append("product_sku_prefix", self.setting.product_sku_prefix);
                 self.data.append("_method", "put");
 
                 axios
                     .post("/settings/system_settings/" + self.setting.id, self.data)
                     .then(response => {
                         self.SubmitProcessing = false;
-                        window.location.href = '/settings/system_settings'; 
+                        window.location.href = '/settings/system_settings';
                         toastr.success('{{ __('translate.Updated_in_successfully') }}');
                         self.errors_settings = {};
                     })
@@ -488,7 +492,7 @@
                     })
                     .then(response => {
                         self.Submit_Processing_Email_Setting = false;
-                        window.location.href = '/settings/system_settings'; 
+                        window.location.href = '/settings/system_settings';
                         toastr.success('{{ __('translate.Updated_in_successfully') }}');
                         self.errors_email_setting = {};
                     })
@@ -510,7 +514,7 @@
                       dump_path: self.backup_settings.dump_path,
                     })
                     .then(response => {
-                        window.location.href = '/settings/system_settings'; 
+                        window.location.href = '/settings/system_settings';
                         toastr.success('{{ __('translate.Updated_in_successfully') }}');
                         self.errors_backup_setting = {};
                     })
@@ -525,7 +529,7 @@
 
 
 
-           
+
         },
         //-----------------------------Autoload function-------------------
         created() {
