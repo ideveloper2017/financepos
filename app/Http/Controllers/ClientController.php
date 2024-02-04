@@ -579,24 +579,206 @@ class ClientController extends Controller
     public function get_Payments_Sale(Request $request, $id)
     {
 
-        $Sale = Sale::findOrFail($id);
-        $payments = PaymentSale::with('sale')
-            ->where('sale_id', $id)
-            ->orderBy('id', 'DESC')->get();
+        $user_auth = auth()->user();
+        if (!$user_auth->can('sales_view_all') && !$user_auth->can('sales_view_own')) {
+            return abort('403', __('You are not authorized'));
+        } else {
+            $helpers = new helpers();
 
-        $due = $Sale->GrandTotal - $Sale->paid_amount;
+            $param = array(
+                0 => 'like',
+                1 => '=',
+                2 => 'like',
+                3 => '=',
+            );
+            $columns = array(
+                0 => 'Ref',
+                1 => 'client_id',
+                2 => 'payment_statut',
+                3 => 'warehouse_id',
+            );
 
-        $payment_methods = PaymentMethod::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','title']);
-        $accounts = Account::where('deleted_at', '=', null)->orderBy('id', 'desc')->get(['id','account_name']);
+            $columns_order = array(
+                0 => 'id',
+                2 => 'date',
+                3 => 'Ref',
+            );
+
+            if ($user_auth->is_all_warehouses) {
+                $array_warehouses_id = Warehouse::where('deleted_at', '=', null)->pluck('id')->toArray();
+            } else {
+                $array_warehouses_id = UserWarehouse::where('user_id', $user_auth->id)->pluck('warehouse_id')->toArray();
+            }
+
+            if (empty($request->warehouse_id)) {
+                $warehouse_id = 0;
+            } else {
+                $warehouse_id = $request->warehouse_id;
+            }
 
 
-        return response()->json([
-            'payments' => $payments,
-            'due' => $due,
-            'payment_methods' => $payment_methods,
-            'accounts' => $accounts,
-        ]);
+            $start = $request->input('start');
+            $order = 'sales.' . $columns_order[$request->input('order.0.column')];
+            $dir = $request->input('order.0.dir');
 
+            $end_date_default = Carbon::now()->addYear()->format('Y-m-d');
+            $start_date_default = Carbon::now()->subYear()->format('Y-m-d');
+            $start_date = empty($request->start_date) ? $start_date_default : $request->start_date;
+            $end_date = empty($request->end_date) ? $end_date_default : $request->end_date;
+
+
+            $sales_data = Sale::where('deleted_at', '=', null)
+                ->whereDate('date', '>=', $start_date)
+                ->whereDate('date', '<=', $end_date)
+                ->where(function ($query) use ($request, $warehouse_id, $array_warehouses_id) {
+                    if ($warehouse_id !== 0) {
+                        return $query->where('warehouse_id', $warehouse_id);
+                    } else {
+                        return $query->whereIn('warehouse_id', $array_warehouses_id);
+                    }
+                })
+                ->where(function ($query) use ($user_auth) {
+                    if (!$user_auth->can('sales_view_all')) {
+                        return $query->where('user_id', '=', $user_auth->id);
+                    }
+                });
+
+            // Filter
+            $sales_Filtred = $helpers->filter($sales_data, $columns, $param, $request)
+
+                // Search With Multiple Param
+                ->where(function ($query) use ($request) {
+                    return $query->when($request->filled('search'), function ($query) use ($request) {
+                        return $query->where('Ref', 'LIKE', "%{$request->input('search.value')}%")
+                            ->orWhere('payment_statut', 'like', "%{$request->input('search.value')}%")
+                            ->orWhere(function ($query) use ($request) {
+                                return $query->whereHas('client', function ($q) use ($request) {
+                                    $q->where('username', 'LIKE', "%{$request->input('search.value')}%");
+                                });
+                            })
+                            ->orWhere(function ($query) use ($request) {
+                                return $query->whereHas('warehouse', function ($q) use ($request) {
+                                    $q->where('name', 'LIKE', "%{$request->input('search.value')}%");
+                                });
+                            });
+                    });
+                });
+
+            $totalRows = $sales_Filtred->count();
+            $totalFiltered = $totalRows;
+
+            if ($request->input('length') != -1)
+                $limit = $request->input('length');
+            else
+                $limit = $totalRows;
+
+            $sales = $sales_Filtred
+                ->with('client', 'warehouse', 'user')
+                ->offset($start)
+                ->limit($limit)
+                ->orderBy($order, $dir)
+                ->get();
+
+            $data = array();
+
+            foreach ($sales as $sale) {
+                $total_return_Due = 0;
+                $total_amount_return = DB::table('sale_returns')
+                    ->where('deleted_at', '=', null)
+                    ->where('sale_id', $sale->id)
+                    ->sum('GrandTotal');
+
+                $total_paid_return = DB::table('sale_returns')
+                    ->where('sale_returns.deleted_at', '=', null)
+                    ->where('sale_returns.sale_id', $sale->id)
+                    ->sum('paid_amount');
+                $total_return_Due = $total_amount_return - $total_paid_return;
+                $item['id'] = $sale->id;
+                $item['date'] = Carbon::parse($sale->date)->format('d-m-Y H:i');
+                $item['created_by'] = $sale->user->username;
+                $item['warehouse_name'] = $sale->warehouse->name;
+                $item['client_name'] = $sale->client->username;
+                $item['client_email'] = $sale->client->email;
+                $item['city_name'] = $sale->client->city;
+                $item['GrandTotal'] = $this->render_price_with_symbol_placement(number_format($sale->GrandTotal - $total_amount_return, 2, '.', ','));
+                $item['paid_amount'] = $this->render_price_with_symbol_placement(number_format($sale->paid_amount - $total_paid_return, 2, '.', ','));
+                $item['due'] = $this->render_price_with_symbol_placement(number_format(($sale->GrandTotal - $sale->paid_amount) - $total_return_Due, 2, '.', ','));
+
+                //payment_status
+                if ($sale->payment_statut == 'paid') {
+                    $item['payment_status'] = '<span class="badge badge-outline-success">' . trans('translate.Paid') . '</span>';
+                } else if ($sale->payment_statut == 'partial') {
+                    $item['payment_status'] = '<span class="badge badge-outline-info">' . trans('translate.Partial') . '</span>';
+                } else {
+                    $item['payment_status'] = '<span class="badge badge-outline-warning">' . trans('translate.Unpaid') . '</span>';
+                }
+
+
+                if (SaleReturn::where('sale_id', $sale->id)->where('deleted_at', '=', null)->exists()) {
+                    $sale_has_return = 'yes';
+                    $item['Ref'] = $sale->Ref . ' ' . '<i class="text-15 text-danger i-Back"></i>';
+                } else {
+                    $sale_has_return = 'no';
+                    $item['Ref'] = $sale->Ref;
+                }
+
+                $item['action'] = '<div class="dropdown">
+                                    <button class="btn btn-outline-info btn-rounded dropdown-toggle" id="dropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
+                    . trans('translate.Action') .
+                    '</button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 34px, 0px);">';
+
+                //check if user has permission "sales_details"
+                if ($user_auth->can('sales_details')) {
+                    $item['action'] .= '<a class="dropdown-item" href="/sale/sales/' . $sale->id . '"> <i class="nav-icon i-Eye font-weight-bold mr-2"></i> ' . trans('translate.SaleDetail') . '</a>';
+                }
+
+                if ($user_auth->can('sales_edit') && $sale_has_return == 'no') {
+                    $item['action'] .= '<a class="dropdown-item" href="/sale/sales/' . $sale->id . '/edit" ><i class="nav-icon i-Edit font-weight-bold mr-2"></i> ' . trans('translate.EditSale') . '</a>';
+                }
+
+                if ($user_auth->can('sale_returns_add') && $sale_has_return == 'no') {
+                    $item['action'] .= '<a class="dropdown-item" href="/sales-return/add_returns_sale/' . $sale->id . '" ><i class="nav-icon i-Back font-weight-bold mr-2"></i> ' . trans('translate.Sell_Return') . '</a>';
+                }
+
+                //check if user has permission "payment_sales_view"
+                if ($user_auth->can('payment_sales_view')) {
+                    $item['action'] .= '<a class="dropdown-item Show_Payments cursor-pointer"  id="' . $sale->id . '" > <i class="nav-icon i-Money-Bag font-weight-bold mr-2"></i> ' . trans('translate.ShowPayment') . '</a>';
+                }
+
+                //check if user has permission "payment_sales_add"
+                if ($user_auth->can('payment_sales_add')) {
+                    $item['action'] .= '<a class="dropdown-item New_Payment cursor-pointer" payment_status="' . $sale->payment_statut . '"  id="' . $sale->id . '" > <i class="nav-icon i-Add font-weight-bold mr-2"></i> ' . trans('translate.AddPayment') . '</a>';
+                }
+
+                $item['action'] .= '<a class="dropdown-item" href="/invoice_pos/' . $sale->id . '" target=_blank> <i class="nav-icon i-File-TXT font-weight-bold mr-2"></i> ' . trans('translate.Invoice_POS') . '</a>
+                        <a class="dropdown-item download_pdf cursor-pointer" Ref="' . $sale->Ref . '" id="' . $sale->id . '" ><i class="nav-icon i-File-TXT font-weight-bold mr-2"></i> ' . trans('translate.DownloadPdf') . '</a>
+                        <a class="dropdown-item  send_email cursor-pointer" id="' . $sale->id . '" ><i class="nav-icon i-Envelope-2 font-weight-bold mr-2"></i> ' . trans('translate.EmailSale') . '</a>
+                        <a class="dropdown-item  send_sms cursor-pointer" id="' . $sale->id . '" ><i class="nav-icon i-Envelope-2 font-weight-bold mr-2"></i> ' . trans('translate.Send_sms') . '</a>';
+
+                //check if user has permission "sales_delete"
+                if ($user_auth->can('sales_delete') && $sale_has_return == 'no') {
+                    $item['action'] .= '<a class="dropdown-item delete cursor-pointer" id="' . $sale->id . '" > <i class="nav-icon i-Close-Window font-weight-bold mr-2"></i> ' . trans('translate.DeleteSale') . '</a>';
+                }
+
+                $item['action'] .= '</div>
+                </div>';
+
+                $data[] = $item;
+
+            }
+
+
+            $json_data = array(
+                "draw" => intval($request->input('draw')),
+                "recordsTotal" => intval($totalRows),
+                "recordsFiltered" => intval($totalFiltered),
+                "data" => $data
+            );
+
+            echo json_encode($json_data);
+
+        }
     }
     public function create()
     {
@@ -907,8 +1089,6 @@ class ClientController extends Controller
                 ])->get();
 
                     $paid_amount_total = $request->montant;
-
-
                         foreach($client_sales_due as $key => $client_sale){
                             if($paid_amount_total == 0)
                             break;

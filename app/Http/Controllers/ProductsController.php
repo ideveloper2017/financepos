@@ -1788,7 +1788,7 @@ class ProductsController extends Controller
     {
         $setting_data = Setting::where('deleted_at', '=', null)->first();
         $sku=Product::latest()->first();
-        $gen_code = number_format(($sku->id+1), 0, '', '');
+        $gen_code = number_format(($sku?$sku->id:0+1), 0, '', '');
         return $setting_data->product_sku_prefix.''.$gen_code;
 
     }

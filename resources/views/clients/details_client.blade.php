@@ -213,10 +213,8 @@
                                 </div>
                                 <hr>
                                 <div class="form-group col-md-12">
-                                    <label for="sms_body_payment_received">{{ __('translate.SMS_Body') }} </label>
-                                    <textarea type="text" v-model="sms_body_payment_received" class="form-control height-200"
-                                              name="sms_body_payment_received" id="sms_body_payment_received"
-                                              placeholder="{{ __('translate.SMS_Body') }}"></textarea>
+
+
                                 </div>
 
                             </div>
