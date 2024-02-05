@@ -205,15 +205,22 @@
 
                         <form @submit.prevent="update_sms_body('payment_received')">
                             <div class="row">
-                                <div class=" col-md-12">
-                                    <span> <strong>{{ __('translate.Available_Tags') }} : </strong></span>
-                                    <p>
-{{--                                        {contact_name},{business_name},{payment_number},{paid_amount}--}}
-                                    </p>
-                                </div>
-                                <hr>
                                 <div class="form-group col-md-12">
-
+                                    <div class="table-responsive">
+                                        <table id="client_payment_table" class="display table table_height">
+                                            <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>{{ __('translate.Date') }}</th>
+                                                <th>{{ __('translate.Created_by') }}</th>
+                                                <th>{{ __('translate.Paid') }}</th>
+                                                <th>{{ __('translate.Payment_Status') }}</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
 
                                 </div>
 
@@ -258,6 +265,7 @@
             client_id={{$client_data['code']}};
             sale_datatable(client_id);
             sales_return_datatable(client_id);
+            client_payment_datatable(client_id)
         })
 
         function sale_datatable( client_id = '') {
@@ -419,6 +427,106 @@
                     {data: 'payment_status', name: 'payment_status'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
 
+                ],
+
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                dom: "<'row'<'col-sm-12 col-md-7'lB><'col-sm-12 col-md-5 p-0'f>>rtip",
+                oLanguage: {
+                    sEmptyTable: "{{ __('datatable.sEmptyTable') }}",
+                    sInfo: "{{ __('datatable.sInfo') }}",
+                    sInfoEmpty: "{{ __('datatable.sInfoEmpty') }}",
+                    sInfoFiltered: "{{ __('datatable.sInfoFiltered') }}",
+                    sInfoThousands: "{{ __('datatable.sInfoThousands') }}",
+                    sLengthMenu: "_MENU_",
+                    sLoadingRecords: "{{ __('datatable.sLoadingRecords') }}",
+                    sProcessing: "{{ __('datatable.sProcessing') }}",
+                    sSearch: "",
+                    sSearchPlaceholder: "{{ __('datatable.sSearchPlaceholder') }}",
+                    oPaginate: {
+                        sFirst: "{{ __('datatable.oPaginate.sFirst') }}",
+                        sLast: "{{ __('datatable.oPaginate.sLast') }}",
+                        sNext: "{{ __('datatable.oPaginate.sNext') }}",
+                        sPrevious: "{{ __('datatable.oPaginate.sPrevious') }}",
+                    },
+                    oAria: {
+                        sSortAscending: "{{ __('datatable.oAria.sSortAscending') }}",
+                        sSortDescending: "{{ __('datatable.oAria.sSortDescending') }}",
+                    }
+                },
+                buttons: [
+                    {
+                        extend: 'collection',
+                        text: "{{ __('translate.EXPORT') }}",
+                        buttons: [
+                            {
+                                extend: 'print',
+                                text: 'print',
+                                exportOptions: {
+                                    columns: ':visible:Not(.not_show)',
+                                    rows: ':visible'
+                                },
+                                title: function(){
+                                    return 'Sales Return List';
+                                },
+                            },
+                            {
+                                extend: 'pdf',
+                                text: 'pdf',
+                                exportOptions: {
+                                    columns: ':visible:Not(.not_show)',
+                                    rows: ':visible'
+                                },
+                                title: function(){
+                                    return 'Sales Return List';
+                                },
+                            },
+                            {
+                                extend: 'excel',
+                                text: 'excel',
+                                exportOptions: {
+                                    columns: ':visible:Not(.not_show)',
+                                    rows: ':visible'
+                                },
+                                title: function(){
+                                    return 'Sales Return List';
+                                },
+                            },
+                            {
+                                extend: 'csv',
+                                text: 'csv',
+                                exportOptions: {
+                                    columns: ':visible:Not(.not_show)',
+                                    rows: ':visible'
+                                },
+                                title: function(){
+                                    return 'Sales Return List';
+                                },
+                            },
+                        ]
+                    }]
+            });
+        }
+        function client_payment_datatable(client_id=''){
+            var table = $('#client_payment_table').DataTable({
+                processing: true,
+                serverSide: true,
+
+
+                ajax: {
+                    url: "{{ route('client_payments_sale') }}",
+                    data: {
+                        client_id: client_id == '0'?'':client_id,
+                        "_token": "{{ csrf_token()}}"
+                    },
+                    dataType: "json",
+                    type: "post"
+                },
+                columns: [
+                    {data: 'id', name: 'id',className: "d-none"},
+                    {data: 'date', name: 'date'},
+                    {data: 'created_by'},
+                    {data: 'paid_amount', name: 'paid_amount'},
+                    {data: 'payment_status', name: 'payment_status'},
                 ],
 
                 lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],

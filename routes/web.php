@@ -243,6 +243,7 @@ if ($installed === true) {
                  Route::get('get_client_plafond/{id}', 'ClientController@get_client_plafond');
                  Route::get('get_client_debt_total/{id}', 'ClientController@get_client_debt_total');
                  Route::get('get_client_debt_return_total/{id}', 'ClientController@get_client_debt_return_total');
+                 Route::post('get_payments_sale', 'ClientController@get_Payments_Sale')->name('client_payments_sale');
 
                  Route::post('clients_pay_due', 'ClientController@clients_pay_due');
                  Route::post('clients_pay_return_due', 'ClientController@clients_pay_return_due');

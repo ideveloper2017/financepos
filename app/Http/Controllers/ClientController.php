@@ -576,7 +576,7 @@ class ClientController extends Controller
         }
     }
 
-    public function get_Payments_Sale(Request $request, $id)
+    public function get_Payments_Sale(Request $request)
     {
 
         $user_auth = auth()->user();
@@ -628,43 +628,11 @@ class ClientController extends Controller
 
 
             $sales_data = Sale::where('deleted_at', '=', null)
-                ->whereDate('date', '>=', $start_date)
-                ->whereDate('date', '<=', $end_date)
-                ->where(function ($query) use ($request, $warehouse_id, $array_warehouses_id) {
-                    if ($warehouse_id !== 0) {
-                        return $query->where('warehouse_id', $warehouse_id);
-                    } else {
-                        return $query->whereIn('warehouse_id', $array_warehouses_id);
-                    }
-                })
-                ->where(function ($query) use ($user_auth) {
-                    if (!$user_auth->can('sales_view_all')) {
-                        return $query->where('user_id', '=', $user_auth->id);
-                    }
-                });
+                ->whereIn('payment_statut', ['paid','partial'])
+                ->where('client_id',$request->client_id);
 
-            // Filter
-            $sales_Filtred = $helpers->filter($sales_data, $columns, $param, $request)
 
-                // Search With Multiple Param
-                ->where(function ($query) use ($request) {
-                    return $query->when($request->filled('search'), function ($query) use ($request) {
-                        return $query->where('Ref', 'LIKE', "%{$request->input('search.value')}%")
-                            ->orWhere('payment_statut', 'like', "%{$request->input('search.value')}%")
-                            ->orWhere(function ($query) use ($request) {
-                                return $query->whereHas('client', function ($q) use ($request) {
-                                    $q->where('username', 'LIKE', "%{$request->input('search.value')}%");
-                                });
-                            })
-                            ->orWhere(function ($query) use ($request) {
-                                return $query->whereHas('warehouse', function ($q) use ($request) {
-                                    $q->where('name', 'LIKE', "%{$request->input('search.value')}%");
-                                });
-                            });
-                    });
-                });
-
-            $totalRows = $sales_Filtred->count();
+            $totalRows = $sales_data->count();
             $totalFiltered = $totalRows;
 
             if ($request->input('length') != -1)
@@ -672,8 +640,8 @@ class ClientController extends Controller
             else
                 $limit = $totalRows;
 
-            $sales = $sales_Filtred
-                ->with('client', 'warehouse', 'user')
+            $sales = $sales_data
+                ->with('user')
                 ->offset($start)
                 ->limit($limit)
                 ->orderBy($order, $dir)
@@ -696,15 +664,9 @@ class ClientController extends Controller
                 $item['id'] = $sale->id;
                 $item['date'] = Carbon::parse($sale->date)->format('d-m-Y H:i');
                 $item['created_by'] = $sale->user->username;
-                $item['warehouse_name'] = $sale->warehouse->name;
-                $item['client_name'] = $sale->client->username;
-                $item['client_email'] = $sale->client->email;
-                $item['city_name'] = $sale->client->city;
-                $item['GrandTotal'] = $this->render_price_with_symbol_placement(number_format($sale->GrandTotal - $total_amount_return, 2, '.', ','));
                 $item['paid_amount'] = $this->render_price_with_symbol_placement(number_format($sale->paid_amount - $total_paid_return, 2, '.', ','));
-                $item['due'] = $this->render_price_with_symbol_placement(number_format(($sale->GrandTotal - $sale->paid_amount) - $total_return_Due, 2, '.', ','));
 
-                //payment_status
+                   //payment_status
                 if ($sale->payment_statut == 'paid') {
                     $item['payment_status'] = '<span class="badge badge-outline-success">' . trans('translate.Paid') . '</span>';
                 } else if ($sale->payment_statut == 'partial') {
