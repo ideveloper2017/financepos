@@ -20,28 +20,27 @@ use Throwable;
 class MyBotHandler extends WebhookHandler
 {
 
+
     public function __construct()
     {
         /** @var \DefStudio\Telegraph\Models\TelegraphBot $bot */
-        $bot = TelegraphBot::find(1);
+        $bot = \DefStudio\Telegraph\Models\TelegraphBot::find(1);
+
         $bot->registerCommands([
-            'start' => 'Restart Bot',
+            'hello' => 'говорит привет',
             'actions' => 'различные действия',
+            'help' => 'что умеет этот бот'
         ])->send();
     }
 
-    public function hello(string $name): void
-    {
-        $this->reply("Привет, $name!");
-    }
 
     public function actions(): void
     {
         Telegraph::message('Выбери какое-то действие')
             ->keyboard(
                 Keyboard::make()->buttons([
-//                    Button::make('Перейти на сайт')->url('https://areaweb.su'),
-//                    Button::make('Поставить лайк')->action('like'),
+//              Button::make('Перейти на сайт')->url('https://areaweb.su'),
+//              Button::make('Поставить лайк')->action('like'),
                     Button::make('Категориялар')->action('categories'),
                     Button::make('Брендлар')->action('brans'),
 //                    Button::make('Подписаться')
@@ -55,20 +54,14 @@ class MyBotHandler extends WebhookHandler
 
     protected function handleChatMessage(Stringable $text): void
     {
-        // in this example, a received message is sent back to the chat
-        $this->chat->html("Received: $text")->send();
         $this->products($text);
     }
 
 
     protected function handleUnknownCommand(Stringable $text): void
     {
-
-
-        if ($text->value() === '/start') {
+        if ($text=='/start') {
             $this->reply('Рад тебя видеть! Давай начнем пользоваться мной :-)');
-
-
         } else {
             $this->reply('Неизвестная команда');
         }
@@ -81,7 +74,7 @@ class MyBotHandler extends WebhookHandler
         }
         report($throwable);
 
-        $this->reply('sorry man, I failed'.' '.$throwable->getMessage());
+        $this->reply('sorry man, I failed'.' '.$throwable->getLine());
     }
 
     public function products(Stringable $text)
@@ -112,18 +105,22 @@ class MyBotHandler extends WebhookHandler
         Telegraph::message('Товарларни танланг!!!')->replyKeyboard($keyboard)->send();
 
     }
-    public function categories(Stringable $text)
+    public function categories()
     {
-        $buttons = [];
-        $categories = Category::where('deleted_at', '=', null)->get();;
-        foreach ($categories as $key => $butacat) {
-            $buttons[$key] = ReplyButton::make($butacat->name);
+        try {
+            $buttons = [];
+            $categories = Category::where('deleted_at', '=', null)->get();;
+            foreach ($categories as $key => $butacat) {
+                $buttons[$key] = ReplyButton::make($butacat->name);
+            }
+            $keyboard = ReplyKeyboard::make()->resize()->oneTime();
+            foreach (array_chunk($buttons, 3) as $chunk) {
+                $keyboard->row($chunk);
+            }
+            Telegraph::message('Категорияларни танланг!!!')->replyKeyboard($keyboard)->send();
+        } catch (\Exception $e){
+            $this->reply($e->getMessage());
         }
-        $keyboard = ReplyKeyboard::make()->resize()->oneTime();
-        foreach (array_chunk($buttons, 3) as $chunk) {
-            $keyboard->row($chunk);
-        }
-        Telegraph::message('Категорияларни танланг!!!')->replyKeyboard($keyboard)->send();
     }
 
     public function brans()
