@@ -5,7 +5,6 @@ namespace App\Telegram;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use DefStudio\Telegraph\Exceptions\TelegraphException;
 use DefStudio\Telegraph\Facades\Telegraph;
 use DefStudio\Telegraph\Handlers\WebhookHandler;
 use DefStudio\Telegraph\Keyboard\Button;
@@ -70,7 +69,7 @@ class MyBotHandler extends WebhookHandler
 
     protected function onFailure(Throwable $throwable): void
     {
-        if ($throwable instanceof TelegraphException) {
+        if ($throwable instanceof NotFoundHttpException) {
             throw $throwable;
         }
         report($throwable);
