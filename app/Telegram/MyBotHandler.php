@@ -38,13 +38,8 @@ class MyBotHandler extends WebhookHandler
         Telegraph::message('Выбери какое-то действие')
             ->keyboard(
                 Keyboard::make()->buttons([
-//              Button::make('Перейти на сайт')->url('https://areaweb.su'),
-//              Button::make('Поставить лайк')->action('like'),
                     Button::make('Категориялар')->action('categories'),
                     Button::make('Брендлар')->action('brans'),
-//                    Button::make('Подписаться')
-//                        ->action('subscribe')
-//                        ->param('channel_name', '@areaweb'),
                 ])
             )->send();
     }
