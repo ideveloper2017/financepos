@@ -28,9 +28,7 @@ class MyBotHandler extends WebhookHandler
 
         $bot->registerCommands([
             'start'=>'Start bot',
-            'hello' => 'говорит привет',
             'actions' => 'различные действия',
-            'help' => 'что умеет этот бот'
         ])->send();
     }
 
