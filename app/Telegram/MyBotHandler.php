@@ -74,7 +74,7 @@ class MyBotHandler extends WebhookHandler
         }
         report($throwable);
 
-        $this->reply('sorry man, I failed'.' '.$throwable->getLine().' '.$throwable->getFile().' '.$throwable->getMessage().' '.$throwable->getCode());
+        $this->reply('sorry man, I failed'.' '.$throwable->getLine().' '.$throwable->getMessage());
     }
 
     public function products(Stringable $text)
