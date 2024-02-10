@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="yutechdb@localhost" uuid="464574b9-4f47-4582-a7ba-80a42afcf511">
+    <data-source source="LOCAL" name="yutech@localhost" uuid="464574b9-4f47-4582-a7ba-80a42afcf511">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <remarks>yutechdb</remarks>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://localhost:3306/yutechdb</jdbc-url>
+      <jdbc-url>jdbc:mysql://localhost:3306/yutech</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>
