@@ -13,6 +13,7 @@ use DefStudio\Telegraph\Keyboard\Keyboard;
 use DefStudio\Telegraph\Keyboard\ReplyButton;
 use DefStudio\Telegraph\Keyboard\ReplyKeyboard;
 use DefStudio\Telegraph\Models\TelegraphBot;
+use DefStudio\Telegraph\Models\TelegraphChat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Stringable;
@@ -25,7 +26,9 @@ class MyBotHandler extends WebhookHandler
 
     public function __construct()
     {
-        /** @var \DefStudio\Telegraph\Models\TelegraphBot $bot */
+        /** @var \DefStudio\Telegraph\Models\TelegraphBot $bot
+         * @var TelegraphChat $chat
+         * */
         $bot = \DefStudio\Telegraph\Models\TelegraphBot::find(1);
 
 
@@ -70,8 +73,8 @@ class MyBotHandler extends WebhookHandler
             throw $throwable;
         }
         report($throwable);
-
-        $this->reply('sorry man, I failed'.' '.$this->chat);
+        $chat=TelegraphChat::$chat_id;
+        $this->reply('sorry man, I failed'.' '.$chat);
     }
 
     public function products(Stringable $text)
