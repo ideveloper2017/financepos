@@ -26,7 +26,7 @@ class MyBotHandler extends WebhookHandler
         /** @var \DefStudio\Telegraph\Models\TelegraphBot $bot */
         $bot = \DefStudio\Telegraph\Models\TelegraphBot::find(1);
 
-        $this->setupChat();;
+
         $bot->registerCommands([
             'start'=>'Start bot',
             'actions' => 'различные действия',
