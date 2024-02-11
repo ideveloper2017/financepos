@@ -63,15 +63,15 @@ class MyBotHandler extends WebhookHandler
         }
     }
 
-//    protected function onFailure(Throwable $throwable): void
-//    {
-//        if ($throwable instanceof NotFoundHttpException) {
-//            throw $throwable;
-//        }
-//        report($throwable);
-//
-//        $this->reply('sorry man, I failed'.' '.$throwable->getLine().' '.$throwable->getMessage());
-//    }
+    protected function onFailure(Throwable $throwable): void
+    {
+        if ($throwable instanceof NotFoundHttpException) {
+            throw $throwable;
+        }
+        report($throwable);
+
+        $this->reply('sorry man, I failed'.' '.$throwable->getCode());
+    }
 
     public function products(Stringable $text)
     {
