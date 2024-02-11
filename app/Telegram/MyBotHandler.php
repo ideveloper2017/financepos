@@ -49,12 +49,16 @@ class MyBotHandler extends WebhookHandler
 
     protected function handleChatMessage(Stringable $text): void
     {
-        $this->products($text);
+        $notificationId = $this->data->get('notification-id'); //42
+
+//        $this->products($text);
     }
 
     public function handleInlineQuery(InlineQuery $inlineQuery): void
     {
         $query = $inlineQuery->query(); // "pest logo"
+
+        $this->reply($query);
         $this->bot->answerInlineQuery($inlineQuery->id(), [$query])->send();
     }
 
