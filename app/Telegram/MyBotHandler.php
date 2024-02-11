@@ -5,6 +5,7 @@ namespace App\Telegram;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use DefStudio\Telegraph\DTO\InlineQuery;
 use DefStudio\Telegraph\Facades\Telegraph;
 use DefStudio\Telegraph\Handlers\WebhookHandler;
 use DefStudio\Telegraph\Keyboard\Button;
@@ -49,6 +50,12 @@ class MyBotHandler extends WebhookHandler
     protected function handleChatMessage(Stringable $text): void
     {
         $this->products($text);
+    }
+
+    public function handleInlineQuery(InlineQuery $inlineQuery): void
+    {
+        $query = $inlineQuery->query(); // "pest logo"
+        $this->bot->answerInlineQuery($inlineQuery->id(), [$query])->send();
     }
 
 
