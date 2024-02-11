@@ -14,6 +14,7 @@ use DefStudio\Telegraph\Keyboard\ReplyButton;
 use DefStudio\Telegraph\Keyboard\ReplyKeyboard;
 use DefStudio\Telegraph\Models\TelegraphBot;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Stringable;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
@@ -69,7 +70,7 @@ class MyBotHandler extends WebhookHandler
             throw $throwable;
         }
         report($throwable);
-
+        Log::debug($this->chat);
         $this->reply('sorry man, I failed'.' '.$throwable->getLine().' '.$throwable->getFile().' '.$throwable->getMessage());
     }
 
