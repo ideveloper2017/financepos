@@ -12,6 +12,7 @@ use DefStudio\Telegraph\Keyboard\Keyboard;
 use DefStudio\Telegraph\Keyboard\ReplyButton;
 use DefStudio\Telegraph\Keyboard\ReplyKeyboard;
 use DefStudio\Telegraph\Models\TelegraphBot;
+use DefStudio\Telegraph\Models\TelegraphChat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Stringable;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -23,13 +24,14 @@ class MyBotHandler extends WebhookHandler
 
     public function __construct()
     {
-        /** @var \DefStudio\Telegraph\Models\TelegraphBot $bot */
-        $bot = \DefStudio\Telegraph\Models\TelegraphBot::find(1);
+        /** @var TelegraphBot $bot */
+        $bot = TelegraphBot::find(1);
 
         $bot->registerCommands([
             'start'=>'Start bot',
             'actions' => 'различные действия',
         ])->send();
+
     }
 
 
@@ -48,6 +50,8 @@ class MyBotHandler extends WebhookHandler
 
     protected function handleChatMessage(Stringable $text): void
     {
+        $chat = TelegraphChat::find(1);
+        $chat->message('hello')->send();
         $this->products($text);
     }
 
