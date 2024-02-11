@@ -5,7 +5,6 @@ namespace App\Telegram;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use DefStudio\Telegraph\Exceptions\TelegraphException;
 use DefStudio\Telegraph\Facades\Telegraph;
 use DefStudio\Telegraph\Handlers\WebhookHandler;
 use DefStudio\Telegraph\Keyboard\Button;
@@ -13,9 +12,7 @@ use DefStudio\Telegraph\Keyboard\Keyboard;
 use DefStudio\Telegraph\Keyboard\ReplyButton;
 use DefStudio\Telegraph\Keyboard\ReplyKeyboard;
 use DefStudio\Telegraph\Models\TelegraphBot;
-use DefStudio\Telegraph\Models\TelegraphChat;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Stringable;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
@@ -26,11 +23,8 @@ class MyBotHandler extends WebhookHandler
 
     public function __construct()
     {
-        /** @var \DefStudio\Telegraph\Models\TelegraphBot $bot
-         * @var TelegraphChat $chat
-         * */
+        /** @var \DefStudio\Telegraph\Models\TelegraphBot $bot */
         $bot = \DefStudio\Telegraph\Models\TelegraphBot::find(1);
-
 
         $bot->registerCommands([
             'start'=>'Start bot',
@@ -69,12 +63,12 @@ class MyBotHandler extends WebhookHandler
 
     protected function onFailure(Throwable $throwable): void
     {
-        if ($throwable instanceof TelegraphException) {
+        if ($throwable instanceof NotFoundHttpException) {
             throw $throwable;
         }
         report($throwable);
-        $chat=TelegraphChat::$chat_id;
-        $this->reply('sorry man, I failed'.' '.$chat);
+
+        $this->reply('sorry man, I failed'.' '.$throwable->getLine().' '.$throwable->getFile().' '.$throwable->getMessage());
     }
 
     public function products(Stringable $text)
