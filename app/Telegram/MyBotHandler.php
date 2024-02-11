@@ -76,7 +76,8 @@ class MyBotHandler extends WebhookHandler
        $buttons = [];
        $products = Product::with('unit', 'category', 'brand')
            ->where(function ($query) use ($text) {
-                   return $query->where(function ($query) use ($text) {
+                   return $query->where('products.name', '=', $text)
+                        ->orWhere(function ($query) use ($text) {
                            return $query->whereHas('category', function ($q) use ($text) {
                                $q->where('name', '=', $text);
                            });
