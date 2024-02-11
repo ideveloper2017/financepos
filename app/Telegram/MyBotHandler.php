@@ -70,7 +70,7 @@ class MyBotHandler extends WebhookHandler
         }
         report($throwable);
 
-        $this->reply('sorry man, I failed'.' '.$throwable->getCode());
+        $this->reply('sorry man, I failed'.' '.$throwable->getTrace());
     }
 
     public function products(Stringable $text)
