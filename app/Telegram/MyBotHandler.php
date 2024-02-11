@@ -14,6 +14,7 @@ use DefStudio\Telegraph\Keyboard\ReplyButton;
 use DefStudio\Telegraph\Keyboard\ReplyKeyboard;
 use DefStudio\Telegraph\Models\TelegraphBot;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Stringable;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
@@ -21,6 +22,7 @@ use Throwable;
 class MyBotHandler extends WebhookHandler
 {
 
+    protected $buttons=[];
 
     public function __construct()
     {
@@ -100,6 +102,7 @@ class MyBotHandler extends WebhookHandler
            })
            ->where('deleted_at', '=', null)->get();;
         foreach ($products as $key => $product) {
+            $this->data->add($product);
             $buttons[$key] = ReplyButton::make($product->name);
         }
         $keyboard = ReplyKeyboard::make()->resize()->oneTime();
