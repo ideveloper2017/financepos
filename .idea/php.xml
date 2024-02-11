@@ -166,6 +166,11 @@
       <path value="$PROJECT_DIR$/vendor/google/grpc-gcp" />
       <path value="$PROJECT_DIR$/vendor/defstudio/telegraph" />
       <path value="$PROJECT_DIR$/vendor/spatie/laravel-package-tools" />
+      <path value="$PROJECT_DIR$/vendor/nutgram/nutgram" />
+      <path value="$PROJECT_DIR$/vendor/nutgram/laravel" />
+      <path value="$PROJECT_DIR$/vendor/nutgram/hydrator" />
+      <path value="$PROJECT_DIR$/vendor/nunomaduro/termwind" />
+      <path value="$PROJECT_DIR$/vendor/sergix44/container" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="7.3" />
