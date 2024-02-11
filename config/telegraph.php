@@ -76,7 +76,7 @@ return [
      */
     'models' => [
         'bot' => DefStudio\Telegraph\Models\TelegraphBot::class,
-        'chat' => DefStudio\Telegraph\Models\TelegraphChat::class,
+       // 'chat' => DefStudio\Telegraph\Models\TelegraphChat::class,
     ],
 
     'storage' => [
