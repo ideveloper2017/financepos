@@ -58,8 +58,8 @@ class MyBotHandler extends WebhookHandler
     {
         $query = $inlineQuery->query(); // "pest logo"
 
-        $this->reply($query);
         $this->bot->answerInlineQuery($inlineQuery->id(), [$query])->send();
+        $this->reply($query);
     }
 
 
