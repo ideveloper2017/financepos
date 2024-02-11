@@ -51,8 +51,9 @@ class MyBotHandler extends WebhookHandler
 
     protected function handleChatMessage(Stringable $text): void
     {
-        $this->reply($this->data->toJson());
+
         $this->products($text);
+        $this->reply($this->data->toJson());
     }
 
     public function handleInlineQuery(InlineQuery $inlineQuery): void
