@@ -50,8 +50,9 @@ class MyBotHandler extends WebhookHandler
 
     protected function handleChatMessage(Stringable $text): void
     {
-        $chat = TelegraphChat::find(1);
-        $chat->message('hello')->send();
+//        $chat = TelegraphChat::find(1);
+//        $chat->message('hello')->send();
+
         $this->products($text);
     }
 
