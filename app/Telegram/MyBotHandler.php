@@ -49,15 +49,16 @@ class MyBotHandler extends WebhookHandler
 
     protected function handleChatMessage(Stringable $text): void
     {
-        $notificationId = $this->data->get('notification-id'); //42
+
+
+
 
 //        $this->products($text);
     }
 
     public function handleInlineQuery(InlineQuery $inlineQuery): void
     {
-        $query = $inlineQuery->query(); // "pest logo"
-
+        $query = $inlineQuery->query();
         $this->bot->answerInlineQuery($inlineQuery->id(), [$query])->send();
         $this->reply($query);
     }
@@ -65,6 +66,13 @@ class MyBotHandler extends WebhookHandler
 
     protected function handleUnknownCommand(Stringable $text): void
     {
+        if (!self::$handleUnknownCommands) {
+            parent::handleUnknownCommand($text);
+        }
+
+        $this->chat->html("I can't understand your command: $text")->send();
+
+
         if ($text=='/start') {
             $this->reply('Рад тебя видеть! Давай начнем пользоваться мной :-)');
         } else {
