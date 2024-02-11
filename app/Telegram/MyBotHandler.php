@@ -49,7 +49,7 @@ class MyBotHandler extends WebhookHandler
 
     protected function handleChatMessage(Stringable $text): void
     {
-        $this->reply($this->message->replyToMessage());
+        $this->reply($this->message->toArray());
 //        $this->products($text);
     }
 
