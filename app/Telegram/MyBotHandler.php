@@ -66,14 +66,7 @@ class MyBotHandler extends WebhookHandler
 
     protected function handleUnknownCommand(Stringable $text): void
     {
-        if (!self::$handleUnknownCommands) {
-            parent::handleUnknownCommand($text);
-        }
-
-        $this->chat->html("I can't understand your command: $text")->send();
-
-
-        if ($text=='/start') {
+       if ($text=='/start') {
             $this->reply('Рад тебя видеть! Давай начнем пользоваться мной :-)');
         } else {
             $this->reply('Неизвестная команда');
