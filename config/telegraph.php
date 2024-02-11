@@ -64,7 +64,7 @@ return [
         /*
          * if enabled, store unknown chats as new TelegraphChat models
          */
-        'store_unknown_chats_in_db' => true,
+        'store_unknown_chats_in_db' => false,
     ],
 
     /*
