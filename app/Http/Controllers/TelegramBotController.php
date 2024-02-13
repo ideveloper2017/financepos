@@ -56,27 +56,6 @@ class TelegramBotController extends Controller
                 break;
             case '/inlinekeyboard':
                 $this->categories();
-//                $option = [
-//                    [
-//                        $this->telegram->buildInlineKeyBoardButton('Callback 1', $url = '', $callback_data = '1'),
-//                        $this->telegram->buildInlineKeyBoardButton('Callback 2', $url = '', $callback_data = '2'),
-//                    ],
-//                ];
-//                $keyb = $this->telegram->buil($option);
-//                $content=['chat_id'=>$chat_id,'reply_markup'=>$keyb,'text'=>'This is an InlineKeyboard Test with Callbacks'];
-//                $this->telegram->sendMessage($content);
-
-//                $option = array(
-//                    //First row
-//                    array($this->telegram->buildInlineKeyBoardButton("Button 1", $url="http://link1.com"), $this->telegram->buildInlineKeyBoardButton("Button 2", $url="http://link2.com")),
-//                    //Second row
-//                    array($this->telegram->buildInlineKeyBoardButton("Button 3", $url="http://link3.com"), $this->telegram->buildInlineKeyBoardButton("Button 4", $url="http://link4.com"),
-//                        $this->telegram->buildInlineKeyBoardButton("Button 5", $url="http://link5.com")),
-//                    //Third row
-//                    array($this->telegram->buildInlineKeyBoardButton("Button 6", $url="http://link6.com")) );
-//                $keyb = $this->telegram->buildInlineKeyBoard($option);
-//                $content = array('chat_id' => $chat_id, 'reply_markup' => $keyb, 'text' => "This is a Keyboard Test");
-//                $this->telegram->sendMessage($content);
                 break;
         }
 
@@ -128,7 +107,7 @@ class TelegramBotController extends Controller
             foreach (array_chunk($buttons, 3) as $chunk) {
                 $keyboard[]=($chunk);
             }
-            $keyb = $this->telegram->buildKeyBoard([$keyboard], true,true);
+            $keyb = $this->telegram->buildKeyBoard($keyboard, true,true);
             $content = array('chat_id' => $this->telegram->ChatID(), 'reply_markup' => $keyb, 'text' => "This is a Keyboard Test");
             $this->telegram->sendMessage($content);
 //            Telegraph::message('Категорияларни танланг!!!')->replyKeyboard($keyboard)->send();
