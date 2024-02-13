@@ -35,11 +35,6 @@ class TelegramBotController extends Controller
                 $content = ['chat_id' => $chat_id, 'text' => 'Welcome to Test GameBot !'];
                 $this->telegram->sendMessage($content);
                 break;
-            case '/where':
-                // Send the Catania's coordinate
-                $content = ['chat_id' => $chat_id, 'latitude' => '37.5', 'longitude' => '15.1'];
-                $this->telegram->sendLocation($content);
-            break;
             case '/categories':
                 $this->categories();
                 break;
@@ -47,6 +42,8 @@ class TelegramBotController extends Controller
                 $this->brands();;
                 break;
         }
+
+        $this->telegram->sendMessage(['text'=>$this->text]);
 
     }
 
