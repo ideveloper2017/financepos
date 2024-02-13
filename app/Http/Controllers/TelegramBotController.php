@@ -46,7 +46,7 @@ class TelegramBotController extends Controller
                         )
                     )
                 ];;
-                $this->telegram->getChatMenuButton(['chat_id' => $chat_id,$data]);
+                $this->telegram->getChatMenuButton($data);
                 break;
             case '/categories':
                 $this->categories();
