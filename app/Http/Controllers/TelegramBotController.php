@@ -110,7 +110,7 @@ class TelegramBotController extends Controller
 //        foreach (array_chunk($buttons, 3) as $chunk) {
 //            $buttons[]=$chunk;
 //        }
-        $keyb = $this->telegram->buildKeyBoard([$buttons], $onetime=false);
+        $keyb = $this->telegram->buildKeyBoard($buttons, true,true);
         $content = array('chat_id' => $this->telegram->ChatID(), 'reply_markup' => $keyb, 'text' => "This is a Keyboard Test");
         $this->telegram->sendMessage($content);
 
