@@ -56,7 +56,7 @@ class TelegramBotController extends Controller
                 $this->telegram->sendMessage($content);
                 break;
             case '/inlinekeyboard':
-                $this->products($this->text);
+             //   $this->products($this->text);
 //                $option = [
 //                    [
 //                        $this->telegram->buildInlineKeyBoardButton('Callback 1', $url = '', $callback_data = '1'),
