@@ -24,16 +24,7 @@ class MyBotHandler extends WebhookHandler
 
     protected $buttons=[];
 
-    public function __construct()
-    {
-        /** @var \DefStudio\Telegraph\Models\TelegraphBot $bot */
-        $bot = \DefStudio\Telegraph\Models\TelegraphBot::find(1);
 
-        $bot->registerCommands([
-            'start'=>'Start bot',
-            'actions' => 'различные действия',
-        ])->send();
-    }
 
 
     public function actions(): void
@@ -49,25 +40,33 @@ class MyBotHandler extends WebhookHandler
 
 
 
-    protected function handleChatMessage(Stringable $text): void
-    {
+//    protected function handleChatMessage(Stringable $text): void
+//    {
+//
+//        $this->products($text);
+//        $this->reply($this->data->toJson());
+//    }
 
-        $this->products($text);
-        $this->reply($this->data->toJson());
-    }
-
-    public function handleInlineQuery(InlineQuery $inlineQuery): void
-    {
-        $query = $inlineQuery->query();
-        $this->bot->answerInlineQuery($inlineQuery->id(), [$query])->send();
-        $this->reply($query);
-    }
+//    public function handleInlineQuery(InlineQuery $inlineQuery): void
+//    {
+//        $query = $inlineQuery->query();
+//        $this->bot->answerInlineQuery($inlineQuery->id(), [$query])->send();
+//        $this->reply($query);
+//    }
 
 
     protected function handleUnknownCommand(Stringable $text): void
     {
+        /** @var TelegraphBot $bot */
        if ($text=='/start') {
             $this->reply('Рад тебя видеть! Давай начнем пользоваться мной :-)');
+
+           $bot = TelegraphBot::query()->where('token','=','6531116972:AAFV_hrRWBi6PJqZ5Jg0z-udScYlLzAcdD0')->first();
+
+           $bot->registerCommands([
+               'start'=>'Start bot',
+               'actions' => 'различные действия',
+           ])->send();
         } else {
             $this->reply('Неизвестная команда');
         }

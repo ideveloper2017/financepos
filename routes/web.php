@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Artisan;
 |
 */
 
+Route::post('/telegram/webhook',[\App\Http\Controllers\TelegramBotController::class,'handler']);
 
 $installed = Storage::disk('public')->exists('installed');
 

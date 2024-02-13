@@ -5,10 +5,10 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "require": {
-        "php": "^7.3|^8.0",
+        "php": "^7.4|^8.0",
         "ar-php/ar-php": "^1.0",
         "barryvdh/laravel-dompdf": "^1.0",
-        "defstudio/telegraph": "^1.41",
+        "eleirbag89/telegrambotphp": "^1.4",
         "ezyang/htmlpurifier": "^4.16",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
