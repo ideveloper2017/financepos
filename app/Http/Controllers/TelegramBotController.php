@@ -43,7 +43,7 @@ class TelegramBotController extends Controller
             case '/categories':
                 $this->categories();
                 break;
-            case '/replykeyboard':
+            case '/brans':
                 $this->brans();;
                 break;
         }
