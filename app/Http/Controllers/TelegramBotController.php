@@ -34,7 +34,7 @@ class TelegramBotController extends Controller
             case '/start':
                 $content = ['chat_id' => $chat_id, 'text' => 'Welcome to Test GameBot !'];
                 $menu = [["Inline"],["Google News"],["button 1","button 2"]];
-                $this->telegram->getChatMenuButton(['chat_id' => $chat_id,'text'=>$menu]);
+                $this->telegram->getChatMenuButton(['chat_id' => $chat_id,'menu_button'=>$menu]);
                 $this->telegram->sendMessage($content);
                 break;
             case '/categories':
