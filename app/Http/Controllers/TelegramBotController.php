@@ -33,6 +33,7 @@ class TelegramBotController extends Controller
         switch ($this->text){
             case '/start':
                 $content = ['chat_id' => $chat_id, 'text' => 'Welcome to Test GameBot !'];
+                $this->telegram->sendMessage($content);
                 $data = [
                     "chat_id"   => $chat_id,
                     'menu_button' => json_encode(
@@ -46,7 +47,6 @@ class TelegramBotController extends Controller
                     )
                 ];;
                 $this->telegram->getChatMenuButton(['chat_id' => $chat_id,$data]);
-                $this->telegram->sendMessage($content);
                 break;
             case '/categories':
                 $this->categories();
