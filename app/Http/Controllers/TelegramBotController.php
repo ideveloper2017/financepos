@@ -40,22 +40,11 @@ class TelegramBotController extends Controller
                 $content = ['chat_id' => $chat_id, 'latitude' => '37.5', 'longitude' => '15.1'];
                 $this->telegram->sendLocation($content);
             break;
-            case '/replykeyboard':
-
-                $option = [
-                    //First row
-                    [$this->telegram->buildKeyboardButton("Button 1"), $this->telegram->buildKeyboardButton("Button 2")],
-                    //Second row
-                    [$this->telegram->buildKeyboardButton("Button 3"), $this->telegram->buildKeyboardButton("Button 4"),
-                        $this->telegram->buildKeyboardButton("Button 5")],
-                    //Third row
-                    [$this->telegram->buildKeyboardButton("Button 6")]];
-                $keyb = $this->telegram->buildKeyBoard($option, $onetime=false);
-                $content = array('chat_id' => $chat_id, 'reply_markup' => $keyb, 'text' => "This is a Keyboard Test");
-                $this->telegram->sendMessage($content);
-                break;
-            case '/inlinekeyboard':
+            case '/categories':
                 $this->categories();
+                break;
+            case '/replykeyboard':
+                $this->brans();;
                 break;
         }
 
@@ -120,15 +109,18 @@ class TelegramBotController extends Controller
     public function brans()
     {
         $buttons = [];
+        $keyboard=[];
         $brands = Brand::where('deleted_at', '=', null)->get();
         foreach ($brands as $key => $brand) {
-            $buttons[$key] = ReplyButton::make($brand->name);
+            $buttons[$key] = $this->telegram->buildKeyboardButton($brand->name);
         }
-        $keyboard = ReplyKeyboard::make();
+
         foreach (array_chunk($buttons, 3) as $chunk) {
-            $keyboard->row($chunk)->resize()->oneTime();
+            $keyboard[]=$chunk;
         }
-        Telegraph::message('Брендларни танланг!!!')->replyKeyboard($keyboard)->send();
+        $keyb = $this->telegram->buildKeyBoard($keyboard, true,true);
+        $content = array('chat_id' => $this->telegram->ChatID(), 'reply_markup' => $keyb, 'text' => "This is a Keyboard Test");
+        $this->telegram->sendMessage($content);
     }
 }
 
