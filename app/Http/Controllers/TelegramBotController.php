@@ -33,8 +33,19 @@ class TelegramBotController extends Controller
         switch ($this->text){
             case '/start':
                 $content = ['chat_id' => $chat_id, 'text' => 'Welcome to Test GameBot !'];
-                $menu = [["Inline"],["Google News"],["button 1","button 2"]];
-                $this->telegram->getChatMenuButton(['chat_id' => $chat_id,'menu_button'=>$menu]);
+                $data = [
+                    'menu_button' => array (
+                        "MenuButtonWebApp" => array (
+                            "type" => "web_app",
+                            "text" => "New Menu",
+                            "web_app" => array (
+                                "url" => "MYWEBSITE"
+                            )
+                        )
+                    )
+
+                ];
+                $this->telegram->getChatMenuButton(['chat_id' => $chat_id,$data]);
                 $this->telegram->sendMessage($content);
                 break;
             case '/categories':
