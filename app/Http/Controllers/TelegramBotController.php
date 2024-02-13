@@ -86,6 +86,7 @@ class TelegramBotController extends Controller
     public function products(Stringable $text)
     {
         $buttons = [];
+        $keyboard=[];
         $products = Product::with('unit', 'category', 'brand')
             ->where(function ($query) use ($text) {
                 return $query->where('products.name', '=', $text)
@@ -106,9 +107,9 @@ class TelegramBotController extends Controller
             $buttons[$key] = $this->telegram->buildKeyboardButton($product->name);
         }
         foreach (array_chunk($buttons, 3) as $chunk) {
-            $buttons[]=$chunk;
+            $keyboard[]=$chunk;
         }
-        $keyb = $this->telegram->buildKeyBoard([$buttons], true,true);
+        $keyb = $this->telegram->buildKeyBoard([$keyboard], true,true);
         $content = array('chat_id' => $this->telegram->ChatID(), 'reply_markup' => $keyb, 'text' => "This is a Keyboard Test");
         $this->telegram->sendMessage($content);
 
