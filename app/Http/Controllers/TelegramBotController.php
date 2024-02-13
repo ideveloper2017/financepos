@@ -43,8 +43,8 @@ class TelegramBotController extends Controller
             case '/categories':
                 $this->categories();
                 break;
-            case '/brans':
-                $this->brans();;
+            case '/brands':
+                $this->brands();;
                 break;
         }
 
@@ -106,7 +106,7 @@ class TelegramBotController extends Controller
         }
     }
 
-    public function brans()
+    public function brands()
     {
         $buttons = [];
         $keyboard=[];
