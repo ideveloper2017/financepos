@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
 use DefStudio\Telegraph\Models\TelegraphChat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Stringable;
 use Telegram;
 
 
@@ -31,7 +35,7 @@ class TelegramBotController extends Controller
             case '/start':
                 $content = ['chat_id' => $chat_id, 'text' => 'Welcome to Test GameBot !'];
                 $menu = [["Inline"],["Google News"],["button 1","button 2"]];
-//                $this->telegram->setChatMenuButton($menu);
+                $this->telegram->setChatMenuButton($menu);
                 $this->telegram->sendMessage($content);
                 break;
             case '/where':
@@ -45,7 +49,8 @@ class TelegramBotController extends Controller
                     //First row
                     [$this->telegram->buildKeyboardButton("Button 1"), $this->telegram->buildKeyboardButton("Button 2")],
                     //Second row
-                    [$this->telegram->buildKeyboardButton("Button 3"), $this->telegram->buildKeyboardButton("Button 4"), $this->telegram->buildKeyboardButton("Button 5")],
+                    [$this->telegram->buildKeyboardButton("Button 3"), $this->telegram->buildKeyboardButton("Button 4"),
+                        $this->telegram->buildKeyboardButton("Button 5")],
                     //Third row
                     [$this->telegram->buildKeyboardButton("Button 6")]];
                 $keyb = $this->telegram->buildKeyBoard($option, $onetime=false);
@@ -53,6 +58,7 @@ class TelegramBotController extends Controller
                 $this->telegram->sendMessage($content);
                 break;
             case '/inlinekeyboard':
+                $this->products($this->text);
 //                $option = [
 //                    [
 //                        $this->telegram->buildInlineKeyBoardButton('Callback 1', $url = '', $callback_data = '1'),
@@ -76,6 +82,71 @@ class TelegramBotController extends Controller
                 break;
         }
 
+    }
+
+
+    public function products(Stringable $text)
+    {
+        $buttons = [];
+        $products = Product::with('unit', 'category', 'brand')
+            ->where(function ($query) use ($text) {
+                return $query->where('products.name', '=', $text)
+                    ->orWhere(function ($query) use ($text) {
+                        return $query->whereHas('category', function ($q) use ($text) {
+                            $q->where('name', '=', $text);
+                        });
+                    })
+                    ->orWhere(function ($query) use ($text) {
+                        return $query->whereHas('brand', function ($q) use ($text) {
+                            $q->where('name', '=', $text);
+                        });
+                    });
+
+            })
+            ->where('deleted_at', '=', null)->get();;
+        foreach ($products as $key => $product) {
+            $this->data->add($product);
+            $buttons[$key] = $this->telegram->buildKeyboardButton($product->name);
+        }
+//        foreach (array_chunk($buttons, 3) as $chunk) {
+//            $keyboard->row($chunk);
+//        }
+        $keyb = $this->telegram->buildKeyBoard($buttons, $onetime=false);
+        $content = array('chat_id' => $this->telegram->ChatID(), 'reply_markup' => $keyb, 'text' => "This is a Keyboard Test");
+        $this->telegram->sendMessage($content);
+
+
+    }
+    public function categories()
+    {
+        try {
+            $buttons = [];
+            $categories = Category::where('deleted_at', '=', null)->get();;
+            foreach ($categories as $key => $butacat) {
+                $buttons[$key] = ReplyButton::make($butacat->name);
+            }
+            $keyboard = ReplyKeyboard::make()->resize()->oneTime();
+            foreach (array_chunk($buttons, 3) as $chunk) {
+                $keyboard->row($chunk);
+            }
+            Telegraph::message('Категорияларни танланг!!!')->replyKeyboard($keyboard)->send();
+        } catch (\Exception $e){
+            $this->reply($e->getMessage());
+        }
+    }
+
+    public function brans()
+    {
+        $buttons = [];
+        $brands = Brand::where('deleted_at', '=', null)->get();
+        foreach ($brands as $key => $brand) {
+            $buttons[$key] = ReplyButton::make($brand->name);
+        }
+        $keyboard = ReplyKeyboard::make();
+        foreach (array_chunk($buttons, 3) as $chunk) {
+            $keyboard->row($chunk)->resize()->oneTime();
+        }
+        Telegraph::message('Брендларни танланг!!!')->replyKeyboard($keyboard)->send();
     }
 }
 
