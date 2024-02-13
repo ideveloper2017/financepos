@@ -104,7 +104,7 @@ class TelegramBotController extends Controller
             })
             ->where('deleted_at', '=', null)->get();;
         foreach ($products as $key => $product) {
-            $buttons[$key] = $this->telegram->buildKeyboardButton($product->name);
+            $buttons[] = $this->telegram->buildKeyboardButton($product->name);
         }
         foreach (array_chunk($buttons, 3) as $chunk) {
             $keyboard[]=$chunk;
