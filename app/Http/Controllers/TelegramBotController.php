@@ -43,7 +43,7 @@ class TelegramBotController extends Controller
                 break;
         }
 
-        $this->telegram->sendMessage(['text'=>$this->text]);
+        $this->telegram->sendMessage(['chat_id' => $chat_id, 'text' => $this->text]);
 
     }
 
