@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use DefStudio\Telegraph\Models\TelegraphChat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Stringable;
@@ -22,7 +21,7 @@ class TelegramBotController extends Controller
 
     public function __construct()
     {
-        $this->bot_token = '6531116972:AAFV_hrRWBi6PJqZ5Jg0z-udScYlLzAcdD0';
+        $this->bot_token = '6829236629:AAHxKFnhynNcpGhw4tDIMoQZxoaHQdZcPss';
         $this->telegram=new Telegram($this->bot_token);
 
     }
