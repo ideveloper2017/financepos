@@ -119,17 +119,22 @@ class TelegramBotController extends Controller
     {
         try {
             $buttons = [];
+            $keyboard=[];
             $categories = Category::where('deleted_at', '=', null)->get();;
             foreach ($categories as $key => $butacat) {
-                $buttons[$key] = ReplyButton::make($butacat->name);
+                $buttons[$key] = $this->telegram->buildKeyboardButton($butacat->name);
             }
-            $keyboard = ReplyKeyboard::make()->resize()->oneTime();
+//            $keyboard = ReplyKeyboard::make()->resize()->oneTime();
             foreach (array_chunk($buttons, 3) as $chunk) {
-                $keyboard->row($chunk);
+                $keyboard[]=($chunk);
             }
-            Telegraph::message('Категорияларни танланг!!!')->replyKeyboard($keyboard)->send();
+            $keyb = $this->telegram->buildKeyBoard([$keyboard], true,true);
+            $content = array('chat_id' => $this->telegram->ChatID(), 'reply_markup' => $keyb, 'text' => "This is a Keyboard Test");
+            $this->telegram->sendMessage($content);
+//            Telegraph::message('Категорияларни танланг!!!')->replyKeyboard($keyboard)->send();
         } catch (\Exception $e){
-            $this->reply($e->getMessage());
+            $content = array('text' => "This is a Keyboard Test");
+            $this->telegram->sendMessage($content);
         }
     }
 
