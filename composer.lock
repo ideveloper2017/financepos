@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e6bdd82559c19b9bd2bdc424fb78a21f",
+    "content-hash": "79e6cc0eb57fd6c9bcde3903a39a6cd9",
     "packages": [
         {
             "name": "ar-php/ar-php",
@@ -3905,150 +3905,6 @@
             "time": "2023-02-08T01:06:31+00:00"
         },
         {
-            "name": "nutgram/hydrator",
-            "version": "6.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/nutgram/hydrator.git",
-                "reference": "cdd8cb922952edc8d295a754f6d70227cfbd369e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/nutgram/hydrator/zipball/cdd8cb922952edc8d295a754f6d70227cfbd369e",
-                "reference": "cdd8cb922952edc8d295a754f6d70227cfbd369e",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^8.1",
-                "psr/container": "^1.1 || ^2.0"
-            },
-            "require-dev": {
-                "illuminate/container": "^10.0",
-                "phpunit/phpunit": "~9.5.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "SergiX44\\Hydrator\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Sergio Brighenti",
-                    "email": "sergio@brighenti.me",
-                    "homepage": "https://github.com/SergiX44"
-                },
-                {
-                    "name": "Anatoly Fenric",
-                    "email": "afenric@gmail.com",
-                    "homepage": "https://github.com/fenric"
-                }
-            ],
-            "description": "Hydrator for PHP 8.0+",
-            "homepage": "https://github.com/nutgram/hydrator",
-            "keywords": [
-                "data-mapper",
-                "dto",
-                "hydrator",
-                "jsonmapper",
-                "mapper",
-                "php8"
-            ],
-            "support": {
-                "issues": "https://github.com/nutgram/hydrator/issues",
-                "source": "https://github.com/nutgram/hydrator/tree/6.0.0"
-            },
-            "time": "2024-01-07T22:43:31+00:00"
-        },
-        {
-            "name": "nutgram/nutgram",
-            "version": "4.15.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/nutgram/nutgram.git",
-                "reference": "81ceeb1f1e9c2121657872c715ceb04a21fe6332"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/nutgram/nutgram/zipball/81ceeb1f1e9c2121657872c715ceb04a21fe6332",
-                "reference": "81ceeb1f1e9c2121657872c715ceb04a21fe6332",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "guzzlehttp/guzzle": "^7.2",
-                "illuminate/macroable": "^8.0|^9.0|^10.0",
-                "laravel/serializable-closure": "^1.2",
-                "nutgram/hydrator": "^6.0",
-                "php": "^8.2",
-                "psr/log": "^1.0|^2.0|^3.0",
-                "psr/simple-cache": "^1.0|^2.0|^3.0",
-                "sergix44/container": "^2.1"
-            },
-            "require-dev": {
-                "ext-reflection": "*",
-                "pestphp/pest": "^2.5",
-                "pestphp/pest-plugin-mock": "^2.0",
-                "roave/security-advisories": "dev-latest",
-                "vimeo/psalm": "^5.7.7"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "src/Support/Helpers.php"
-                ],
-                "psr-4": {
-                    "SergiX44\\Nutgram\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Sergio Brighenti",
-                    "email": "sergio@brighenti.me",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Luca Patera",
-                    "email": "lucapatera@outlook.it",
-                    "role": "Developer"
-                }
-            ],
-            "description": "The Telegram bot library that doesn't drive you nuts",
-            "homepage": "https://github.com/SergiX44/Nutgram",
-            "keywords": [
-                "api",
-                "bot",
-                "framework",
-                "laravel",
-                "library",
-                "nutgram",
-                "telegram"
-            ],
-            "support": {
-                "issues": "https://github.com/nutgram/nutgram/issues",
-                "source": "https://github.com/nutgram/nutgram/tree/4.15.2"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/Lukasss93",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/SergiX44",
-                    "type": "github"
-                }
-            ],
-            "time": "2024-02-06T17:58:36+00:00"
-        },
-        {
             "name": "nwidart/laravel-modules",
             "version": "10.0.6",
             "source": {
@@ -5511,62 +5367,6 @@
             "time": "2024-02-15T16:41:13+00:00"
         },
         {
-            "name": "sergix44/container",
-            "version": "2.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/SergiX44/container.git",
-                "reference": "54513797b8dba8d9b5d4db62b9d3c862d56f696c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/SergiX44/container/zipball/54513797b8dba8d9b5d4db62b9d3c862d56f696c",
-                "reference": "54513797b8dba8d9b5d4db62b9d3c862d56f696c",
-                "shasum": ""
-            },
-            "require": {
-                "ext-reflection": "*",
-                "php": "^8.1",
-                "psr/container": "^1.1|^2.0"
-            },
-            "provide": {
-                "psr/container-implementation": "^1.1|^2.0"
-            },
-            "require-dev": {
-                "pestphp/pest": "^2.0",
-                "php-di/php-di": "^7.0",
-                "vimeo/psalm": "^5.13"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "SergiX44\\Container\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Sergio Brighenti",
-                    "email": "sergio@brighenti.me"
-                }
-            ],
-            "description": "A simple and fast service container",
-            "support": {
-                "issues": "https://github.com/SergiX44/container/issues",
-                "source": "https://github.com/SergiX44/container/tree/2.1.0"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/SergiX44",
-                    "type": "github"
-                }
-            ],
-            "time": "2023-07-04T16:59:59+00:00"
-        },
-        {
             "name": "spatie/laravel-permission",
             "version": "6.3.0",
             "source": {
@@ -5730,16 +5530,16 @@
         },
         {
             "name": "stripe/stripe-php",
-            "version": "v13.10.0",
+            "version": "v13.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/stripe/stripe-php.git",
-                "reference": "7571f6001f122db539901bda113aef7ed7af421a"
+                "reference": "d92a95bd61be5d3141d86986c3b454065f9fcc13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/7571f6001f122db539901bda113aef7ed7af421a",
-                "reference": "7571f6001f122db539901bda113aef7ed7af421a",
+                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/d92a95bd61be5d3141d86986c3b454065f9fcc13",
+                "reference": "d92a95bd61be5d3141d86986c3b454065f9fcc13",
                 "shasum": ""
             },
             "require": {
@@ -5783,9 +5583,9 @@
             ],
             "support": {
                 "issues": "https://github.com/stripe/stripe-php/issues",
-                "source": "https://github.com/stripe/stripe-php/tree/v13.10.0"
+                "source": "https://github.com/stripe/stripe-php/tree/v13.11.0"
             },
-            "time": "2024-02-01T22:16:21+00:00"
+            "time": "2024-02-16T00:23:50+00:00"
         },
         {
             "name": "summernote/summernote",
@@ -11600,7 +11400,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.0|^7.4|^8.0|^8.1"
+        "php": "^8.0|^8.1"
     },
     "platform-dev": [],
     "plugin-api-version": "2.6.0"

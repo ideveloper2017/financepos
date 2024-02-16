@@ -5,7 +5,7 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^7.0|^7.4|^8.0|^8.1",
+        "php": "^8.0|^8.1",
         "ar-php/ar-php": "^1.0",
         "barryvdh/laravel-dompdf": "*",
         "guzzlehttp/guzzle": "^7.2",
@@ -16,7 +16,6 @@
         "laravel/tinker": "^2.8",
         "laravel/ui": "*",
         "maatwebsite/excel": "*",
-        "nutgram/nutgram": "^4.15",
         "nwidart/laravel-modules": "^10.0",
         "spatie/laravel-permission": "^6.3",
         "stripe/stripe-php": "^13.10",
