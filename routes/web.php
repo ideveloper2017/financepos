@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TelegramBotController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Artisan;
@@ -28,21 +29,15 @@ use Illuminate\Support\Facades\Artisan;
 */
 
 Route::post('/telegram/webhook',[\App\Http\Controllers\TelegramBotController::class,'handler']);
-
+Route::post('/webhook', [TelegramBotController::class]);
 $installed = Storage::disk('public')->exists('installed');
 
 if ($installed === true) {
-
     Auth::routes(['register' => false]);
-
-
     Route::middleware(['XSS'])->group(function () {
-
         Route::get('/', "HomeController@RedirectToLogin");
         Route::get('switch/language/{lang}', 'LocalController@languageSwitch')->name('language.switch');
-
         //------------------------------- dashboard Admin--------------------------\\
-
         Route::group(['middleware'=>'auth','Is_Admin' , 'Is_Active'],function(){
             Route::get('dashboard/admin', "DashboardController@dashboard_admin")->name('dashboard');
 

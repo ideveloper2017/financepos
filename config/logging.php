@@ -3,6 +3,7 @@
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
+use SergiX44\Nutgram\Laravel\Log\NutgramLogger;
 
 return [
 
@@ -113,6 +114,12 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+        'telegram' => [
+            'driver' => 'custom',
+            'via' => NutgramLogger::class,
+            'level' => 'debug',
+            'chat_id' => env('NUTGRAM_LOG_CHAT_ID'), // any chat_id where bot can write messages
+        ]
     ],
 
 ];
