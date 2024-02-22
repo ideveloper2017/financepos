@@ -1,20 +1,9 @@
 <?php
-/** @var SergiX44\Nutgram\Nutgram $bot */
 
-use App\Telegram\Commands\StartCommand;
-use SergiX44\Nutgram\Nutgram;
+Route::post('/api/telegram/webhook/{token}', static function (\Longman\TelegramBot\Telegram $bot, $token) {
+    if ($token != config('telegram.bot.api_token')) {
+        abort(400);
+    }
 
-/*
-|--------------------------------------------------------------------------
-| Nutgram Handlers
-|--------------------------------------------------------------------------
-|
-| Here is where you can register telegram handlers for Nutgram. These
-| handlers are loaded by the NutgramServiceProvider. Enjoy!
-| env('TELEGRAM_TOKEN')
-*/
-$bot = new Nutgram($_ENV['TELEGRAM_TOKEN']);
-//$bot->registerCommand(StartCommand::class);
-$bot->onCommand('start', function (Nutgram $bot) {
-    return $bot->sendMessage('Hello, world!');
-})->description('The start command!');
+    $bot->handle();
+})->middleware('telegram.network')->name('telegram.webhook');
